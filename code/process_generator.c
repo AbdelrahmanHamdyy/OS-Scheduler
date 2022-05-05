@@ -108,7 +108,7 @@ int main(int argc, char * argv[])
             }
             else
             {
-                printf("ana da5el el scheduler\n");
+                //printf("ana da5el el scheduler\n");
                 execl("./scheduler.out",  string(numberOfProcesses,result), string(algorithm,result), NULL);
             }
         }
@@ -121,18 +121,18 @@ int main(int argc, char * argv[])
             // 6. Send the information to the scheduler at the appropriate time.
 
             int current = 0;
-            printf("-------------------------------\n");
+            //printf("-------------------------------\n");
             while (current < numberOfProcesses) {
                 int arrival = processes[current].arrivaltime;
                 if (arrival == getClk()) {
-                    printf("Sending Process %d\n", current + 1);
-                    printf("Current Time: %d, Arrival: %d\n", getClk(), arrival);
-                    send_val = msgsnd(msgq_id, &processes[current], sizeof(processes[current]), !IPC_NOWAIT);
+                    //printf("Sending Process %d\n", current + 1);
+                    //printf("Current Time: %d, Arrival: %d\n", getClk(), arrival);
+                    send_val = msgsnd(msgq_id, &processes[current], sizeof(struct processData), !IPC_NOWAIT);
                     if (send_val == -1)
                         perror("Error in send\n");
                     else {
-                        printf("Message Queue filled\n");
-                        printf("-------------------------------\n");
+                        //printf("Message Queue filled\n");
+                        //printf("-------------------------------\n");
                     }
                     current++;
                 }

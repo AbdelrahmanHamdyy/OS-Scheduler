@@ -4,7 +4,7 @@
 int main(int agrc, char * argv[])
 {
     initClk();
-    printf("ana fel process\n");
+    //printf("ana fel process\n");
     //TODO it needs to get the remaining time from somewhere
     //remainingtime = ??;
     key_t shmKey1;
