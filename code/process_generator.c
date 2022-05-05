@@ -139,6 +139,10 @@ int main(int argc, char * argv[])
             }
             // 7. Clear clock resources
             //kill(getpgrp(), SIGINT);
+            int stat_loc;
+            waitpid(schedulerpid, &stat_loc, 0);
+            if(WIFEXITED(stat_loc))
+  	            raise(SIGINT);
         }
     }
 }
