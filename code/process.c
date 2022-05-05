@@ -16,11 +16,6 @@ int main(int agrc, char * argv[])
         exit(-1);
     }
     int *shmaddr =(int *) shmat(shmid1, (void *)0, 0);
-    if (shmaddr == -1)
-    {
-        perror("Error in attach in writer");
-        exit(-1);
-    }
     int prev=getClk();
     while ((*shmaddr) > 0)
     {

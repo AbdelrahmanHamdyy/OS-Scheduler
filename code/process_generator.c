@@ -146,7 +146,8 @@ int main(int argc, char * argv[])
 void clearResources(int signum)
 {
     //TODO Clears all resources in case of interruption
+    printf("clearing\n");
     msgctl(msgq_id, IPC_RMID, (struct msqid_ds *)0);
     destroyClk(true);
-    kill(getpid(), SIGKILL);
+    raise(SIGKILL);
 }
