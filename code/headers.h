@@ -147,7 +147,7 @@ void push(Node** head, struct PCB* d, int p)
         // Traverse the list and find a
         // position to insert new node
         while (start->next != NULL &&
-            start->next->priority < p) {
+            start->next->priority <= p) {
             start = start->next;
         }
  
