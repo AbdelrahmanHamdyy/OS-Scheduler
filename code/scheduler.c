@@ -98,6 +98,7 @@ int main(int argc, char * argv[])
         HPF();
     }
     shmdt(remainingTime);
+    shmctl(shmid1, IPC_RMID, NULL);
     fclose(SchedulerLog);
     destroyClk(true);
 }
