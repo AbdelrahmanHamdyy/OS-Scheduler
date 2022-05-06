@@ -46,6 +46,7 @@ struct PCB *createProcess()
         newProcess->brust=message.runningtime;
         newProcess->id=message.id;
         newProcess->priority=message.priority;
+        newProcess->running=0;
         newProcess->wait=0;
         newProcess->stop=0;
         //printf("\nMessage received:\n");
