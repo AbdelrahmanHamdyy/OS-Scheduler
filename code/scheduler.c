@@ -52,7 +52,11 @@ struct PCB *createProcess()
         return newProcess;
     }
 }
+
 void HPF();
+void SRTN();
+void RR();
+
 int main(int argc, char * argv[])
 {
     initClk();
@@ -82,11 +86,11 @@ int main(int argc, char * argv[])
             break;
 
         case 2:
-            HPF();
+            SRTN();
             break;
 
         case 3:
-            HPF();
+            RR();
             break;
 
         default:
@@ -178,4 +182,12 @@ void HPF(){
         }
     }
     
+}
+
+void SRTN() {
+    printf("Shortest Remaining Time Next\n");
+}
+
+void RR() {
+    printf("Round Robin with time slot %d\n", slot);
 }

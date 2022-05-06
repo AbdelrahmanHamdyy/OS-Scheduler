@@ -8,7 +8,7 @@ int main(int agrc, char * argv[])
     //TODO it needs to get the remaining time from somewhere
     //remainingtime = ??;
     key_t shmKey1;
-    shmKey1=ftok("keyfile",65);
+    shmKey1=ftok("keyfile", 65);
     int shmid1=shmget(shmKey1,sizeof(int),0666);
     if (shmid1 == -1)
     {

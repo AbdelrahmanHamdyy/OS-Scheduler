@@ -27,7 +27,7 @@ int main(int argc, char * argv[])
 
     // ------ 1. Read the input files.
 
-    FILE *file = fopen("processes.txt", "r"); // Opening the File
+    FILE *file = fopen("processes.txt", "r"); // Opening the File to get the number of processes
     if (file == NULL) {
         printf("Error! File not opened.\n");
         return 1;
@@ -43,7 +43,7 @@ int main(int argc, char * argv[])
     printf("Number of Processes: %d\n", numberOfProcesses);
 
     fclose(file);
-    file = fopen("processes.txt", "r");
+    file = fopen("processes.txt", "r"); // Opening again to store the processes
     if (file == NULL) {
         printf("Error! File not opened.\n");
         return 1;
@@ -52,6 +52,8 @@ int main(int argc, char * argv[])
     struct processData *processes = malloc(sizeof(struct processData) * numberOfProcesses); // Array of processes
     fscanf(file, "%s %s %s %s", id_str, arrival_str, runtime_str, priority_str);
     int index = 0;
+    printf("**Input***\n");
+    printf("%s  %s  %s  %s\n", id_str, arrival_str, runtime_str, priority_str);
     while (index < numberOfProcesses) {
         int i, a, r, p;
         fscanf(file, "%d\t%d\t%d\t%d", &i, &a, &r, &p);
@@ -59,7 +61,7 @@ int main(int argc, char * argv[])
         processes[index].arrivaltime = a;
         processes[index].runningtime = r;
         processes[index].priority = p;
-        printf("Output: %d\t%d\t%d\t%d \n", i, a, r, p);
+        printf("%d\t%d\t%d\t%d \n", i, a, r, p);
         index++;
     }
     fclose(file); // CLose File
@@ -67,6 +69,7 @@ int main(int argc, char * argv[])
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     
     int algorithm;
+    printf("-------------------------------\n");
     printf("Choose a scheduling algorithm:\n");
     printf("1. Non-preemptive Highest Priority First (HPF).\n");
     printf("2. Shortest Remaining time Next (SRTN).\n");
@@ -98,18 +101,19 @@ int main(int argc, char * argv[])
             perror("Error in creating scheduler process\n");
         else if (schedulerpid == 0) {
             system("gcc scheduler.c -o scheduler.out");
-             char result[10];
             if (algorithm == 3) {
                 int timeSlot;
                 printf("Enter the time slot for Round Robin: ");
                 scanf("%d", &timeSlot);
-
-                execl("./scheduler.out", string(numberOfProcesses,result), string(algorithm,result), string(timeSlot,result), NULL);
+                printf("Scheduling..\n");
+                char n_str[10], a_str[10], t_str[10];
+                execl("./scheduler.out", string(numberOfProcesses, n_str), string(algorithm, a_str), string(timeSlot, t_str), NULL);
             }
             else
             {
-                //printf("ana da5el el scheduler\n");
-                execl("./scheduler.out",  string(numberOfProcesses,result), string(algorithm,result), NULL);
+                printf("Scheduling..\n");
+                char n_str[10], a_str[10];
+                execl("./scheduler.out",  string(numberOfProcesses, n_str), string(algorithm, a_str), NULL);
             }
         }
         else {
@@ -138,11 +142,8 @@ int main(int argc, char * argv[])
                 }
             }
             // 7. Clear clock resources
-            //kill(getpgrp(), SIGINT);
             int stat_loc;
             waitpid(schedulerpid, &stat_loc, 0);
-            if(WIFEXITED(stat_loc))
-  	            raise(SIGINT);
         }
     }
 }
@@ -150,8 +151,7 @@ int main(int argc, char * argv[])
 void clearResources(int signum)
 {
     //TODO Clears all resources in case of interruption
-    printf("clearing\n");
+    printf("Clearing\n");
     msgctl(msgq_id, IPC_RMID, (struct msqid_ds *)0);
-    destroyClk(true);
     raise(SIGKILL);
 }
