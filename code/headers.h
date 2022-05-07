@@ -83,6 +83,19 @@ struct PCB
     int start;
     int wait;
 };
+void setPCB(struct PCB* wantedone,int val1,int val2,int val3,int val4,int val5,int val6,int val7,int val8,int val9,int val10)
+{
+    wantedone->arrival=val1;
+    wantedone->brust=val2;
+    wantedone->finish=val3;
+    wantedone->id=val4;
+    wantedone->pid=val5;
+    wantedone->priority=val6;
+    wantedone->running=val7;
+    wantedone->start=val8;
+    wantedone->stop=val9;
+    wantedone->wait=val10;
+}
 //-----------------------------------------------------------
 // Node
 typedef struct node {
@@ -92,7 +105,6 @@ typedef struct node {
     int priority;
  
     struct node* next;
- 
 } Node;
  
 // Function to Create A New Node
@@ -104,8 +116,7 @@ Node* newNode(struct PCB* d, int p)
     temp->next = NULL;
  
     return temp;
-}
- 
+} 
 // Return the value at head
 struct PCB* peek(Node** head)
 {
@@ -120,7 +131,17 @@ void pop(Node** head)
     (*head) = (*head)->next;
     free(temp);
 }
- 
+
+void QueuePrint(Node** head)
+{
+    Node*start=*head;
+    int index=1;
+    while(start){
+        printf("the node number %d which has id %d and burst time %d\n",index,start->data->id,start->data->brust);
+        index++;
+        start=start->next;
+    }
+}
 // Function to push according to priority
 void push(Node** head, struct PCB* d, int p)
 {
@@ -157,11 +178,34 @@ void push(Node** head, struct PCB* d, int p)
         start->next = temp;
     }
 }
+
  
 // Function to check is list is empty
 int isEmpty(Node** head)
 {
     return (*head) == NULL;
+}
+
+bool IsTHere(Node**head,int val)
+{
+    Node* start=*head;
+    if(start==NULL)
+    return false;
+    if(start->data->id==val)
+    {
+        *head=start->next;
+        return true;
+    }
+    while(start->next)
+    {
+        if(start->next->data->id==val)
+        {
+           start->next=start->next->next;
+           return true;   
+        }    
+        start=start->next;    
+    }
+    return false;
 }
 struct processData
 {
@@ -170,3 +214,4 @@ struct processData
     int runningtime;
     int id;
 };
+

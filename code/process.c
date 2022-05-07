@@ -1,14 +1,19 @@
 #include "headers.h"
-
+void handl(int signum)
+{
+    destroyClk(false);
+    raise(SIGKILL);
+}
 /* Modify this file as needed*/
 int main(int agrc, char * argv[])
 {
     initClk();
-    //printf("ana fel process\n");
+    printf("ana fel process\n");
     //TODO it needs to get the remaining time from somewhere
     //remainingtime = ??;
+    signal(SIGCHLD,handl);
     key_t shmKey1;
-    shmKey1=ftok("keyfile", 65);
+    shmKey1=ftok("keyfile",65);
     int shmid1=shmget(shmKey1,sizeof(int),0666);
     if (shmid1 == -1)
     {
@@ -20,12 +25,19 @@ int main(int agrc, char * argv[])
     while ((*shmaddr) > 0)
     {
         int curr=getClk();
-        while(curr==prev){
-            curr=getClk();
-        }
-        prev=curr;
-        (*shmaddr)--;
+       while(prev==curr)
+       {
+       curr=getClk();
+       }
+       prev=curr;
+       (*shmaddr)--;
+
+      //printf("remaining time is : %d \n",*shmaddr);
+     
     }
+    printf("ana tl3t mn l process\n");
     destroyClk(false);
     return 0;
 }
+
+
