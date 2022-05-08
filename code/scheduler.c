@@ -7,7 +7,7 @@ int*remainingTime;
 struct PCB *runningProcess,*temporary;
 Node* readyQueue,*Stopping_Resuming_Queue;
 FILE * SchedulerLog;
-
+struct Queue* queue;
 void remainingTimeSharedMemory()
 {
     key_t shmKey1;
@@ -97,7 +97,9 @@ int main(int argc, char * argv[])
             break;
 
         case 3:
+            queue=createQueue(numOfProcesses);
             RR();
+            free(queue);
             break;
 
         default:
@@ -116,12 +118,19 @@ void resumeProcess(struct PCB* p)
     p->wait += getClk()-p->stop;
     fprintf(SchedulerLog, "At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
                                 getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
+    kill(p->pid,SIGCONT);
+    printf("At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
+                                 getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
 void stopProcess(struct PCB* p)
 {
     p->stop = getClk();
+
     fprintf(SchedulerLog, "At time %d process %d stopped arr  %d total %d remain  %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
+    kill(p->pid,SIGSTOP);
+     printf( "At time %d process %d stoped arr  %d total %d remain  %d wait %d\n", 
+                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
 void finishProcess(struct PCB* p)
 {
@@ -129,6 +138,8 @@ void finishProcess(struct PCB* p)
     double WTA = (getClk() - p->arrival) * 1.0 / p->brust;
       fprintf(SchedulerLog, "At time %d process %d finished arr  %d total %d remain  %d wait %d  TA %d WTA %.2f\n", 
                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);
+    printf("At time %d process %d finished arr  %d total %d remain  %d wait %d  TA %d WTA %.2f\n", 
+                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);                           
 }
 
 void startProcess(struct PCB* p)
@@ -137,6 +148,8 @@ void startProcess(struct PCB* p)
     p->wait += p->start-p->arrival;
     fprintf(SchedulerLog, "At time %d process %d started arr  %d total %d remain  %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
+     printf("At time %d process %d started arr  %d total %d remain  %d wait %d\n", 
+                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
 
 void HPF(){
@@ -154,8 +167,8 @@ void HPF(){
             push(&readyQueue,curr,curr->priority);
             curr=createProcess();
         }
-        if(runningProcess)
-            printf("dlw2te fe running process rkm %d w fadlha %d\n",runningProcess->id,*remainingTime);
+        // if(runningProcess)
+        //     printf("dlw2te fe running process rkm %d w fadlha %d\n",runningProcess->id,*remainingTime);
 
         if(!runningProcess && !isEmpty(&readyQueue))
         {
@@ -174,7 +187,7 @@ void HPF(){
                 execl("./process","process", NULL);
             }
         }
-        int currClk = getClk();
+        //int currClk = getClk();
         if(*remainingTime == 0 && runningProcess)
         {
             runningProcess->running = runningProcess->brust;
@@ -279,5 +292,69 @@ void SRTN(){
 }
 void RR()
 {
+    int slotStart=0;
 	printf("Round Robin with time slot %d\n", slot);
+    while(finishedProcesses < numOfProcesses){
+        //sleep(1);
+        //printf("yamosahel\n");
+        struct PCB *curr = createProcess();
+        while(curr)
+        {
+            //printf("ana keda estalamt element mn el queue\n");
+            //printf("\n*************************\n%d --- %d --- %d --- %d\n*************************\n",curr->id,curr->arrival,curr->priority,curr->brust);
+            fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
+                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
+            printf("At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
+                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
+            
+            enqueue(queue,curr);
+            curr=createProcess();
+        }
+
+
+        if(!runningProcess && !isEmptyQ(queue))
+        {
+            runningProcess = dequeue(queue);
+            slotStart=getClk();
+            *remainingTime = runningProcess->brust-runningProcess->running;
+            if(runningProcess->running)
+            {
+                printf("remianing : %d\n",*remainingTime);
+                resumeProcess(runningProcess);
+            }
+            else{
+                startProcess(runningProcess);
+                int pid = fork();
+                if (pid == -1)
+                {
+  	                scanf("error in fork in scheduler\n");
+                    kill(getpgrp(), SIGKILL);
+                }
+                if(pid == 0)
+                {
+                    execl("./process","process", NULL);
+                }
+                runningProcess->pid=pid;
+            }
+        }
+        if(*remainingTime == 0 && runningProcess)
+        {
+            runningProcess->running = runningProcess->brust;
+            finishProcess(runningProcess);
+            free(runningProcess);
+            runningProcess = NULL;
+            finishedProcesses++;
+            //printf("elhamdol\n");
+        }
+        if(getClk()-slotStart==slot&&runningProcess)
+        {
+            if(!isEmptyQ(queue))
+            {
+                runningProcess->running+=slot;
+                stopProcess(runningProcess);
+                enqueue(queue,runningProcess);
+                runningProcess=NULL;
+            }
+        }
+    }
 }

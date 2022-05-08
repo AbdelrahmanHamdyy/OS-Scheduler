@@ -8,7 +8,7 @@ void handl(int signum)
 int main(int agrc, char * argv[])
 {
     initClk();
-    printf("ana fel process\n");
+    //printf("ana fel process\n");
     //TODO it needs to get the remaining time from somewhere
     //remainingtime = ??;
     signal(SIGCHLD,handl);
@@ -24,18 +24,18 @@ int main(int agrc, char * argv[])
     int prev=getClk();
     while ((*shmaddr) > 0)
     {
-        int curr=getClk();
+        printf("yarab\n");
+       int curr=getClk();
        while(prev==curr)
        {
        curr=getClk();
        }
        prev=curr;
        (*shmaddr)--;
-
-      //printf("remaining time is : %d \n",*shmaddr);
+       printf("remaining time is : %d \n",*shmaddr);
      
     }
-    printf("ana tl3t mn l process\n");
+    //printf("ana tl3t mn l process\n");
     destroyClk(false);
     return 0;
 }
