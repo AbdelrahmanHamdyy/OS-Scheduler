@@ -132,6 +132,26 @@ void stopProcess(struct PCB* p)
      printf( "At time %d process %d stoped arr  %d total %d remain  %d wait %d\n", 
                                 getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
+
+void resumeSRTN(struct PCB* p)
+{
+    p->wait += getClk()-p->stop;
+    fprintf( SchedulerLog, "At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
+                                getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
+    // printf("At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
+    //                             getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
+
+}
+void stopSRTN(struct  PCB* p)
+{
+    
+     p->stop=getClk();
+    fprintf( SchedulerLog, "At time %d process %d stopped arr  %d total %d remain  %d wait %d\n", 
+                               getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
+    // printf( "At time %d process %d stoped arr  %d total %d remain  %d wait %d\n", 
+    //                            getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
+}
+
 void finishProcess(struct PCB* p)
 {
     p->wait = getClk()-p->arrival-p->brust;
@@ -211,8 +231,6 @@ void SRTN(){
             printf("\n*************************\n ID: %d---Arr:%d ---Priority:%d ---Brust:%d\n*************************\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
-           
-
             push(&readyQueue,curr,curr->brust);
             //QueuePrint(&readyQueue);
             curr=createProcess();
@@ -237,7 +255,7 @@ void SRTN(){
                 MYone->stop = getClk();
                 push(&readyQueue, MYone, MYone->brust-MYone->running);
                 push(&Stopping_Resuming_Queue, MYone, MYone->brust-MYone->running);
-                stopProcess(runningProcess);
+                stopSRTN(runningProcess);
                 free(runningProcess);
                 runningProcess = NULL;  
                 killpg(getpgrp(), SIGCHLD);
@@ -261,7 +279,7 @@ void SRTN(){
             *remainingTime = runningProcess->brust-runningProcess->running;
             if(IsTHere(&Stopping_Resuming_Queue,runningProcess->id))
             {
-                resumeProcess(runningProcess);
+                resumeSRTN(runningProcess);
             }
             else
             {
@@ -287,7 +305,7 @@ void SRTN(){
             runningProcess=NULL;
             finishedProcesses++;
         }
-        sleep(1);
+        // sleep(1);
     }
 }
 void RR()
