@@ -52,7 +52,7 @@ int main(int argc, char * argv[])
     struct processData *processes = malloc(sizeof(struct processData) * numberOfProcesses); // Array of processes
     fscanf(file, "%s %s %s %s", id_str, arrival_str, runtime_str, priority_str);
     int index = 0;
-    printf("**Input***\n");
+    printf("*Input**\n");
     printf("%s  %s  %s  %s\n", id_str, arrival_str, runtime_str, priority_str);
     while (index < numberOfProcesses) {
         int i, a, r, p;
@@ -77,46 +77,44 @@ int main(int argc, char * argv[])
     scanf("%d", &algorithm);
     printf("-------------------------------\n");
 
+    int timeSlot;
+    if (algorithm == 3) {
+        printf("Enter the time slot for Round Robin: ");
+        scanf("%d", &timeSlot);
+    }
+
     // 3. Initiate and create the scheduler and clock processes.
 
-    // Clock
-    printf("Forking Clock..\n");
+    // Scheduler
+    printf("Forking Scheduler..\n");
     int pid = fork();
     if (pid == -1) 
-        perror("Error in creating clock process\n");
+        perror("Error in creating scheduler process\n");
     else if (pid == 0) {
-        system("gcc clk.c -o clk.out");
-        execl("./clk.out", "clk", NULL);
+        system("gcc scheduler.c -o scheduler.out");
+        printf("Scheduling..\n");
+        char n_str[10], a_str[10], t_str[10];
+        if (algorithm == 3)
+            execl("./scheduler.out", string(numberOfProcesses, n_str), string(algorithm, a_str), string(timeSlot, t_str), NULL);
+        else
+            execl("./scheduler.out",  string(numberOfProcesses, n_str), string(algorithm, a_str), NULL);
     }
-    
-    // 4. Use this function after creating the clock process to initialize clock
 
-    initClk();
-
-    // Scheduler
+    // Clock
     if (pid != 0) {
-        printf("Forking Scheduler..\n");
-        int schedulerpid = fork();
-        if (schedulerpid == -1) 
-            perror("Error in creating scheduler process\n");
-        else if (schedulerpid == 0) {
-            system("gcc scheduler.c -o scheduler.out");
-            if (algorithm == 3) {
-                int timeSlot;
-                printf("Enter the time slot for Round Robin: ");
-                scanf("%d", &timeSlot);
-                printf("Scheduling..\n");
-                char n_str[10], a_str[10], t_str[10];
-                execl("./scheduler.out", string(numberOfProcesses, n_str), string(algorithm, a_str), string(timeSlot, t_str), NULL);
-            }
-            else
-            {
-                printf("Scheduling..\n");
-                char n_str[10], a_str[10];
-                execl("./scheduler.out",  string(numberOfProcesses, n_str), string(algorithm, a_str), NULL);
-            }
+        printf("Forking Clock..\n");
+        int clkpid = fork();
+        if (clkpid == -1) 
+            perror("Error in creating clock process\n");
+        else if (clkpid == 0) {
+            system("gcc clk.c -o clk.out");
+            execl("./clk.out", "clk", NULL);
         }
         else {
+            // 4. Use this function after creating the clock process to initialize clock
+
+            initClk();
+
             // TODO Generation Main Loop
             // 5. Create a data structure for processes and provide it with its parameters.
 
@@ -132,20 +130,15 @@ int main(int argc, char * argv[])
                     //printf("Sending Process %d\n", current + 1);
                     //printf("Current Time: %d, Arrival: %d\n", getClk(), arrival);
                     send_val = msgsnd(msgq_id, &processes[current], sizeof(struct processData), !IPC_NOWAIT);
-                    if (send_val == -1)
-                        perror("Error in send\n");
-                    else {
-                        //printf("Message Queue filled\n");
-                        //printf("-------------------------------\n");
-                    }
                     current++;
                 }
             }
             // 7. Clear clock resources
             int stat_loc;
-            waitpid(schedulerpid, &stat_loc, 0);
+            waitpid(pid, &stat_loc, 0);
         }
     }
+    initClk();
 }
 
 void clearResources(int signum)
