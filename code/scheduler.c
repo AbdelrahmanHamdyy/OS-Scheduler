@@ -1,5 +1,49 @@
 #include "headers.h"
 
+//Physical memory 
+struct memory_node*memory[11];
+struct memory_node
+{
+    int size;
+    int start;
+    struct memory_node*next;
+};
+void rabbit(int start,int i,int size)
+{
+    struct memory_node*temp=malloc(sizeof(struct memory_node));
+    temp->start=start;
+    temp->size=size;
+    temp->next=memory[i];
+    memory[i]=temp;
+}
+int allocate(int size)
+{
+    int memSize=ceil(log2(size));
+    int startSplit=memSize;
+    while(!memory[startSplit])
+    {
+        startSplit++;
+    }
+    for(int i=startSplit;i>memSize;i--)
+    {
+        int childSize=1<<(i-1);
+        struct memory_node*temp=memory[i];
+        memory[i]=memory[i]->next;
+        int start=temp->start;
+        free(temp);
+        rabbit(start,i-1,childSize);
+        rabbit(start+childSize,i-1,childSize);
+    }
+    if(memory[memSize])
+    {
+        struct memory_node*temp=memory[memSize];
+        memory[memSize]=memory[memSize]->next;
+        int start=temp->start;
+        free(temp);
+        return start;
+    }
+}
+
 //this struct can be considered as letter 
 
 int shmid1,msgq_id,numOfProcesses,typeAlgo,slot,finishedProcesses=0;
