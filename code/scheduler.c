@@ -43,6 +43,49 @@ int allocate(int size)
         return start;
     }
 }
+void deallocate(int start,int size)
+{
+    int i=ceil(log2(size));
+    size=1<<i;
+    int index=start/size;
+    int op=0;
+    if(index%2==0)
+    {
+         op=1;
+    }
+    else
+    {
+        op=-1;
+    }
+     struct memory_node* temp=memory[i];
+        int found=0;
+         struct memory_node* prev=NULL;
+        while(temp){
+            int tempIndex=temp->start/temp->size;
+            if(tempIndex==(index+op)){
+                if(prev==NULL)
+                    memory[i]=temp->next;
+                else
+                    prev->next=temp->next;
+                if(index%2==0)
+                {
+                    deallocate(start, size*2);
+                }
+                else
+                {
+                    deallocate(temp->start, size*2);
+                }
+                  free(temp);
+                found=1;
+                break;
+            }
+            prev=temp;
+        temp=temp->next;
+        }
+        if(!found){
+           rabbit(start,i,size);
+    }
+}
 
 //this struct can be considered as letter 
 

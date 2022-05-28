@@ -83,6 +83,8 @@ struct PCB
     int priority;
     int start;
     int wait;
+    int startAddress;
+    int size;
 };
 void setPCB(struct PCB* wantedone,int val1,int val2,int val3,int val4,int val5,int val6,int val7,int val8,int val9,int val10)
 {
