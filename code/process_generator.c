@@ -2,7 +2,19 @@
 
 void clearResources(int);
 
-int msgq_id;
+int msgq_id, shmid;
+
+void arrivalsSharedMemory()
+{
+    key_t shmKey;
+    shmKey=ftok("keyfile",120);
+    shmid=shmget(shmKey, sizeof(int) *1000, IPC_CREAT|0666);
+    if (shmid == -1)
+    {
+        perror("Error in creating the shared memory");
+        exit(-1);
+    }
+}
 
 int main(int argc, char * argv[])
 {
@@ -11,6 +23,12 @@ int main(int argc, char * argv[])
     // TODO Initialization
 
     // Initializing Message Queue
+    arrivalsSharedMemory();
+    int *arrivals;
+    arrivals = (int*) shmat(shmid, 0, 0);
+    //memset(arrivals, 0, 1000);
+    for(int i=0;i<1000;i++)
+    arrivals[i]=0;
 
     key_t key_id;
     int send_val;
@@ -61,6 +79,7 @@ int main(int argc, char * argv[])
         processes[index].runningtime = r;
         processes[index].priority = p;
         processes[index].memsize = m;
+        arrivals[a]++;
         printf("%d\t%d\t%d\t%d\t%d \n", i, a, r, p, m);
         index++;
     }

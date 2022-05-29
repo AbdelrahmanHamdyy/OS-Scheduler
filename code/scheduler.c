@@ -1,6 +1,5 @@
 #include "headers.h"
 #define MEMORY_LIMIT 1024
-
 //Physical memory 
 struct memory_node*memory[11];
 struct memory_node
@@ -96,8 +95,9 @@ void deallocate(int start,int size)
 
 //this struct can be considered as letter 
 
-int shmid1,msgq_id,prevClkID,numOfProcesses,typeAlgo,slot,finishedProcesses=0;
+int shmid1,arrivalsshID,msgq_id,prevClkID,numOfProcesses,typeAlgo,slot,finishedProcesses=0;
 int*remainingTime;
+int*arrivals;
 union Semun semun;
 int sem;
 struct PCB *runningProcess,*temporary;
@@ -117,7 +117,17 @@ void remainingTimeSharedMemory()
         exit(-1);
     }
 }
-
+void numberOfProcessarrived()
+{
+    key_t shmKey1;
+    shmKey1=ftok("keyfile",120);
+    arrivalsshID=shmget(shmKey1,sizeof(int),0666);
+    if (arrivalsshID == -1)
+    {
+        perror("Error in creating the shared memory");
+        exit(-1);
+    }
+}
 void processesMessageQueue()
 {
     key_t msgqKey;
@@ -206,7 +216,8 @@ int main(int argc, char * argv[])
     //Semaphore to make sure no two processes are executed at the same time
     //ProcessSemaphore();
     prevClkSharedMemory();
-
+    numberOfProcessarrived();
+    arrivals =(int *) shmat(arrivalsshID, (void *)0, 0);
     remainingTime=(int*)shmat(shmid1,0,0);
      if (argc<2) {
 		printf("Too few arguments. Exiting!\n");
@@ -241,7 +252,10 @@ int main(int argc, char * argv[])
     
     printf("Scheduling done\n");
     shmdt(remainingTime);
+    shmdt(arrivals);
     shmctl(shmid1, IPC_RMID, NULL);
+    shmctl(prevClkID, IPC_RMID, NULL);
+    shmctl(arrivalsshID, IPC_RMID, NULL);
     //semctl(sem, 0, IPC_RMID);
     fclose(SchedulerLog);
     fclose(MemoryLog);
@@ -358,9 +372,12 @@ void HPF(){
     while(finishedProcesses < numOfProcesses){
         //sleep(1);
         //printf("yamosahel\n");
-        struct PCB *curr = createProcess();
+        while(arrivals[getClk()])
+        {
+            struct PCB *curr = createProcess();
         while(curr)
         {
+            arrivals[getClk()]--;
             //printf("ana keda estalamt element mn el queue\n");
             //printf("\n****\n%d --- %d --- %d --- %d\n****\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
@@ -372,6 +389,7 @@ void HPF(){
                push(&waitingQueue, curr, curr->size);*/
             push(&readyQueue,curr,curr->priority);
             curr=createProcess();
+        }
         }
         // if(runningProcess)
         //     printf("dlw2te fe running process rkm %d w fadlha %d\n",runningProcess->id,*remainingTime);
