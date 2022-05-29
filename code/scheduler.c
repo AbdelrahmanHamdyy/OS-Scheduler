@@ -357,15 +357,15 @@ void HPF(){
         while(curr)
         {
             //printf("ana keda estalamt element mn el queue\n");
-            //printf("\n*********\n%d --- %d --- %d --- %d\n*********\n",curr->id,curr->arrival,curr->priority,curr->brust);
+            //printf("\n****\n%d --- %d --- %d --- %d\n****\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
-            bool allocated = allocateMemoryLog(curr);
+            /*bool allocated = allocateMemoryLog(curr);
             if (allocated)
                push(&readyQueue,curr,curr->priority);
             else
-               push(&waitingQueue, curr, curr->size);
-
+               push(&waitingQueue, curr, curr->size);*/
+            push(&readyQueue,curr,curr->priority);
             curr=createProcess();
         }
         // if(runningProcess)
@@ -375,6 +375,7 @@ void HPF(){
         {
             runningProcess = peek(&readyQueue);
             pop(&readyQueue);
+            allocateMemoryLog(runningProcess);
             *remainingTime = runningProcess->brust;
             startProcess(runningProcess);
             int pid = fork();
