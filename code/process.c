@@ -37,6 +37,7 @@ int main(int agrc, char * argv[])
     {
        //printf("clock from process %d\n",getClk());
        //printf("**prev : %d, curr : %d\n",*prev,getClk());
+       fflush(stdout);
        while(*prev==getClk())
        {
            //printf("adham\n");
@@ -49,9 +50,10 @@ int main(int agrc, char * argv[])
        *prev=getClk();
        (*shmaddr)--;
        printf("*****remaining time is : %d, pid: %d \n",*shmaddr,getpid());
+       fflush(stdout);
      
     }
-    //printf("ana tl3t mn l process\n");
+    printf("ana tl3t mn l process %d\n",getpid());
     shmdt(shmaddr);
     shmdt(prev);
     destroyClk(false);
