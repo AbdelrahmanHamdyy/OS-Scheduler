@@ -216,6 +216,7 @@ struct processData
     int priority;
     int runningtime;
     int id;
+    int memsize;
 };
 
 //----------------------queue---------------------------------

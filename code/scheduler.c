@@ -1,4 +1,5 @@
 #include "headers.h"
+#define MEMORY_LIMIT 1024
 
 //Physical memory 
 struct memory_node*memory[11];
@@ -42,6 +43,8 @@ int allocate(int size)
         free(temp);
         return start;
     }
+    else
+        return -1;
 }
 void deallocate(int start,int size)
 {
@@ -94,7 +97,9 @@ int*remainingTime;
 struct PCB *runningProcess,*temporary;
 Node* readyQueue,*Stopping_Resuming_Queue;
 FILE * SchedulerLog;
+FILE * MemoryLog;
 struct Queue* queue;
+Node* waitingQueue;
 void remainingTimeSharedMemory()
 {
     key_t shmKey1;
@@ -139,6 +144,7 @@ struct PCB *createProcess()
         newProcess->running=0;
         newProcess->wait=0;
         newProcess->stop=0;
+        newProcess->size = message.memsize;
        // printf("\nMessage received: at time %d\n",getClk());
         return newProcess;
     }
@@ -153,8 +159,10 @@ void handl(int signum) {}
 int main(int argc, char * argv[])
 {
     initClk();
-    SchedulerLog = fopen("SchedulerLog.txt", "w");
-    //printf("*************************\nana fel scheduler\n**********************************\n");
+    rabbit(0,10,MEMORY_LIMIT);
+    SchedulerLog = fopen("scheduler.log", "w");
+    MemoryLog = fopen("memory.log", "w");
+    //printf("********\nana fel scheduler\n***********\n");
     //TODO implement the scheduler :)
     //upon termination release the clock resources.
     //shared memory between process and scheduler (remaining time)
@@ -197,7 +205,29 @@ int main(int argc, char * argv[])
     shmdt(remainingTime);
     shmctl(shmid1, IPC_RMID, NULL);
     fclose(SchedulerLog);
+    fclose(MemoryLog);
     destroyClk(true);
+}
+
+bool allocateMemoryLog(struct PCB* p) 
+{
+    printf("Allocating Memory..\n");
+    p->startAddress = allocate(p->size);
+    int i = p->startAddress;
+    if (i == -1)
+        return false;
+    int j = i + pow(2, ceil(log2(p->size))) - 1;
+    fprintf(MemoryLog, "At time %d allocated %d bytes for process %d from %d to %d\n", getClk(), p->size, p->id, i, j);
+    return true;
+}
+
+void deallocateMemoryLog(struct PCB* p) 
+{
+    printf("Deallocating Memory..\n");
+    int i = p->startAddress;
+    int j = i + pow(2, ceil(log2(p->size))) - 1;
+    deallocate(p->startAddress, p->size);
+    fprintf(MemoryLog, "At time %d freed %d bytes for process %d from %d to %d\n", getClk(), p->size, p->id, i, j);
 }
 
 void resumeProcess(struct PCB* p)
@@ -212,7 +242,6 @@ void resumeProcess(struct PCB* p)
 void stopProcess(struct PCB* p)
 {
     p->stop = getClk();
-
     fprintf(SchedulerLog, "At time %d process %d stopped arr  %d total %d remain  %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
     kill(p->pid,SIGSTOP);
@@ -242,11 +271,23 @@ void stopSRTN(struct  PCB* p)
 void finishProcess(struct PCB* p)
 {
     p->wait = getClk()-p->arrival-p->brust;
+    deallocateMemoryLog(p);
     double WTA = (getClk() - p->arrival) * 1.0 / p->brust;
       fprintf(SchedulerLog, "At time %d process %d finished arr  %d total %d remain  %d wait %d  TA %d WTA %.2f\n", 
                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);
     printf("At time %d process %d finished arr  %d total %d remain  %d wait %d  TA %d WTA %.2f\n", 
-                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);                           
+                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);
+
+    while(!isEmpty(&waitingQueue)) {
+        struct PCB *waitingProcess = peek(&waitingQueue);
+        bool allocated = allocateMemoryLog(waitingProcess);
+        if (allocated) {
+            pop(&waitingQueue);
+            push(&readyQueue, waitingProcess, waitingProcess->priority);
+        }
+        else
+            break;
+    }                       
 }
 
 void startProcess(struct PCB* p)
@@ -268,10 +309,15 @@ void HPF(){
         while(curr)
         {
             //printf("ana keda estalamt element mn el queue\n");
-            //printf("\n*************************\n%d --- %d --- %d --- %d\n*************************\n",curr->id,curr->arrival,curr->priority,curr->brust);
+            //printf("\n*********\n%d --- %d --- %d --- %d\n*********\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
-            push(&readyQueue,curr,curr->priority);
+            bool allocated = allocateMemoryLog(curr);
+            if (allocated)
+               push(&readyQueue,curr,curr->priority);
+            else
+               push(&waitingQueue, curr, curr->size);
+
             curr=createProcess();
         }
         // if(runningProcess)
@@ -308,14 +354,14 @@ void HPF(){
 
 void SRTN(){
     printf("SRTN\n");
-    int prev=getClk(); 
+
     while(finishedProcesses < numOfProcesses){   
         // printf("we are at time %d\n",getClk()); 
         struct PCB *curr = createProcess();
         while(curr)
         {
            // printf("ana keda estalamt element mn el queue\n");
-            printf("\n*************************\n ID: %d---Arr:%d ---Priority:%d ---Brust:%d\n*************************\n",curr->id,curr->arrival,curr->priority,curr->brust);
+            printf("\n*********\n ID: %d---Arr:%d ---Priority:%d ---Brust:%d\n*********\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
             push(&readyQueue,curr,curr->brust);
@@ -340,6 +386,7 @@ void SRTN(){
                 MYone->running = runningProcess->running;
                 MYone->wait = runningProcess->wait;
                 MYone->stop = getClk();
+                MYone->size = runningProcess->size;
                 push(&readyQueue, MYone, MYone->brust-MYone->running);
                 push(&Stopping_Resuming_Queue, MYone, MYone->brust-MYone->running);
                 stopSRTN(runningProcess);
@@ -406,7 +453,7 @@ void RR()
         while(curr)
         {
             //printf("ana keda estalamt element mn el queue\n");
-            //printf("\n*************************\n%d --- %d --- %d --- %d\n*************************\n",curr->id,curr->arrival,curr->priority,curr->brust);
+            //printf("\n*********\n%d --- %d --- %d --- %d\n*********\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
             printf("At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 

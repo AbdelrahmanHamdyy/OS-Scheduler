@@ -33,11 +33,10 @@ int main(int argc, char * argv[])
         return 1;
     }
     int numberOfProcesses = 0;
-    char id_str[10], arrival_str[10], runtime_str[10], priority_str[10];
-    fscanf(file, "%s %s %s %s", id_str, arrival_str, runtime_str, priority_str);
+    fscanf(file, "%*[^\n]");
     while (!feof(file)) {
-        int i, a, r, p;
-        fscanf(file, "%d\t%d\t%d\t%d", &i, &a, &r, &p);
+        int i, a, r, p, m;
+        fscanf(file, "%d\t%d\t%d\t%d\t%d", &i, &a, &r, &p, &m);
         numberOfProcesses = i;
     }
     printf("Number of Processes: %d\n", numberOfProcesses);
@@ -50,18 +49,19 @@ int main(int argc, char * argv[])
     }
 
     struct processData *processes = malloc(sizeof(struct processData) * numberOfProcesses); // Array of processes
-    fscanf(file, "%s %s %s %s", id_str, arrival_str, runtime_str, priority_str);
+    fscanf(file, "%*[^\n]");
     int index = 0;
-    printf("*Input**\n");
-    printf("%s  %s  %s  %s\n", id_str, arrival_str, runtime_str, priority_str);
+    printf("Input*\n");
+    printf("id   arrival   runtime   priority   memsize\n");
     while (index < numberOfProcesses) {
-        int i, a, r, p;
-        fscanf(file, "%d\t%d\t%d\t%d", &i, &a, &r, &p);
+        int i, a, r, p, m;
+        fscanf(file, "%d\t%d\t%d\t%d\t%d", &i, &a, &r, &p, &m);
         processes[index].id = i;
         processes[index].arrivaltime = a;
         processes[index].runningtime = r;
         processes[index].priority = p;
-        printf("%d\t%d\t%d\t%d \n", i, a, r, p);
+        processes[index].memsize = m;
+        printf("%d\t%d\t%d\t%d\t%d \n", i, a, r, p, m);
         index++;
     }
     fclose(file); // CLose File
@@ -91,7 +91,8 @@ int main(int argc, char * argv[])
     if (pid == -1) 
         perror("Error in creating scheduler process\n");
     else if (pid == 0) {
-        system("gcc scheduler.c -o scheduler.out");
+        //system("gcc scheduler.c -o scheduler.out ");
+        system("gcc -Wall -o scheduler.out scheduler.c -lm -fno-stack-protector");
         printf("Scheduling..\n");
         char n_str[10], a_str[10], t_str[10];
         if (algorithm == 3)
@@ -107,7 +108,7 @@ int main(int argc, char * argv[])
         if (clkpid == -1) 
             perror("Error in creating clock process\n");
         else if (clkpid == 0) {
-            system("gcc clk.c -o clk.out");
+            system("gcc clk.c -o clk.out -fno-stack-protector");
             execl("./clk.out", "clk", NULL);
         }
         else {
@@ -138,7 +139,6 @@ int main(int argc, char * argv[])
             waitpid(pid, &stat_loc, 0);
         }
     }
-    initClk();
 }
 
 void clearResources(int signum)
