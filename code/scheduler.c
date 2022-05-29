@@ -275,6 +275,9 @@ void resumeProcess(struct PCB* p)
     p->wait += getClk()-p->stop;
     fprintf(SchedulerLog, "At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
                                 getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
+    int *prev =(int *) shmat(prevClkID, (void *)0, 0);
+    *prev=getClk();
+    shmdt(prev);
     kill(p->pid,SIGCONT);
     printf("At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
                                  getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
