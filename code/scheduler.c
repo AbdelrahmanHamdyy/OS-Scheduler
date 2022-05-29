@@ -19,22 +19,24 @@ void rabbit(int start,int i,int size)
 }
 int allocate(int size)
 {
+    
     int memSize=ceil(log2(size));
     int startSplit=memSize;
-    while(!memory[startSplit])
+    while(startSplit<11 && !memory[startSplit])
     {
         startSplit++;
-    }
-    for(int i=startSplit;i>memSize;i--)
+    } 
+    for(int i=startSplit;i>memSize&& i<11;i--)
     {
         int childSize=1<<(i-1);
         struct memory_node*temp=memory[i];
         memory[i]=memory[i]->next;
         int start=temp->start;
         free(temp);
-        rabbit(start,i-1,childSize);
         rabbit(start+childSize,i-1,childSize);
+        rabbit(start,i-1,childSize);
     }
+     
     if(memory[memSize])
     {
         struct memory_node*temp=memory[memSize];
@@ -44,7 +46,9 @@ int allocate(int size)
         return start;
     }
     else
+    {
         return -1;
+    }
 }
 void deallocate(int start,int size)
 {
@@ -92,8 +96,10 @@ void deallocate(int start,int size)
 
 //this struct can be considered as letter 
 
-int shmid1,msgq_id,numOfProcesses,typeAlgo,slot,finishedProcesses=0;
+int shmid1,msgq_id,prevClkID,numOfProcesses,typeAlgo,slot,finishedProcesses=0;
 int*remainingTime;
+union Semun semun;
+int sem;
 struct PCB *runningProcess,*temporary;
 Node* readyQueue,*Stopping_Resuming_Queue;
 FILE * SchedulerLog;
@@ -120,6 +126,34 @@ void processesMessageQueue()
     if (msgq_id == -1)
     {
         perror("Error in importing the message queue");
+        exit(-1);
+    }
+}
+
+void prevClkSharedMemory()
+{
+    key_t prevClkKey;
+    prevClkKey=ftok("keyfile",100);
+    prevClkID=shmget(prevClkKey,sizeof(int),IPC_CREAT|0666);
+    if (prevClkID == -1)
+    {
+        perror("Error in creating the shared memorytttttttttttttt");
+        exit(-1);
+    }
+}
+
+void ProcessSemaphore() {
+    sem = semget(IPC_PRIVATE, 1, 0666 | IPC_CREAT);
+    if (sem == -1)
+    {
+        perror("Error in create sem");
+        exit(-1);
+    }
+
+    semun.val = 1; /* initial value of the semaphore, Binary semaphore */
+    if (semctl(sem, 0, SETVAL, semun) == -1)
+    {
+        perror("Error in semctl");
         exit(-1);
     }
 }
@@ -169,6 +203,10 @@ int main(int argc, char * argv[])
     remainingTimeSharedMemory();
     //message queue between process_generator and scheduler (insert processes)
     processesMessageQueue();
+    //Semaphore to make sure no two processes are executed at the same time
+    //ProcessSemaphore();
+    prevClkSharedMemory();
+
     remainingTime=(int*)shmat(shmid1,0,0);
      if (argc<2) {
 		printf("Too few arguments. Exiting!\n");
@@ -204,6 +242,7 @@ int main(int argc, char * argv[])
     printf("Scheduling done\n");
     shmdt(remainingTime);
     shmctl(shmid1, IPC_RMID, NULL);
+    //semctl(sem, 0, IPC_RMID);
     fclose(SchedulerLog);
     fclose(MemoryLog);
     destroyClk(true);
@@ -214,6 +253,7 @@ bool allocateMemoryLog(struct PCB* p)
     printf("Allocating Memory..\n");
     p->startAddress = allocate(p->size);
     int i = p->startAddress;
+    printf("After Allocation - start %d - size %d\n", i, p->size);
     if (i == -1)
         return false;
     int j = i + pow(2, ceil(log2(p->size))) - 1;
@@ -245,7 +285,7 @@ void stopProcess(struct PCB* p)
     fprintf(SchedulerLog, "At time %d process %d stopped arr  %d total %d remain  %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
     kill(p->pid,SIGSTOP);
-     printf( "At time %d process %d stoped arr  %d total %d remain  %d wait %d\n", 
+     printf( "At time %d process %d stopped arr  %d total %d remain  %d wait %d\n", 
                                 getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
 
@@ -260,7 +300,6 @@ void resumeSRTN(struct PCB* p)
 }
 void stopSRTN(struct  PCB* p)
 {
-    
      p->stop=getClk();
     fprintf( SchedulerLog, "At time %d process %d stopped arr  %d total %d remain  %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
@@ -279,15 +318,21 @@ void finishProcess(struct PCB* p)
                                 getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);
 
     while(!isEmpty(&waitingQueue)) {
+        printf("Inside Waiting Queue Loop\n");
         struct PCB *waitingProcess = peek(&waitingQueue);
         bool allocated = allocateMemoryLog(waitingProcess);
         if (allocated) {
             pop(&waitingQueue);
-            push(&readyQueue, waitingProcess, waitingProcess->priority);
+            if (typeAlgo == 3)
+                enqueue(queue, waitingProcess);
+            else if (typeAlgo == 2)
+                push(&readyQueue, waitingProcess, waitingProcess->brust - waitingProcess->running);
+            else
+                push(&readyQueue, waitingProcess, waitingProcess->priority);
         }
         else
             break;
-    }                       
+    }                      
 }
 
 void startProcess(struct PCB* p)
@@ -337,9 +382,11 @@ void HPF(){
             }
             if(pid == 0)
             {
+                printf("%d\n", runningProcess->id);
                 execl("./process","process", NULL);
             }
         }
+
         //int currClk = getClk();
         if(*remainingTime == 0 && runningProcess)
         {
@@ -364,8 +411,12 @@ void SRTN(){
             printf("\n*********\n ID: %d---Arr:%d ---Priority:%d ---Brust:%d\n*********\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
-            push(&readyQueue,curr,curr->brust);
-            //QueuePrint(&readyQueue);
+            bool allocated = allocateMemoryLog(curr);
+            if (allocated)
+               push(&readyQueue, curr, curr->brust - curr->running);
+            else
+               push(&waitingQueue, curr, curr->size);
+
             curr=createProcess();
         }
  
@@ -411,6 +462,8 @@ void SRTN(){
             runningProcess = peek(&readyQueue);
             pop(&readyQueue);
             *remainingTime = runningProcess->brust-runningProcess->running;
+            QueuePrint(&readyQueue);
+            QueuePrint(&Stopping_Resuming_Queue);
             if(IsTHere(&Stopping_Resuming_Queue,runningProcess->id))
             {
                 resumeSRTN(runningProcess);
@@ -444,7 +497,7 @@ void SRTN(){
 }
 void RR()
 {
-    int slotStart=0;
+    int remainingStart=0;
 	printf("Round Robin with time slot %d\n", slot);
     while(finishedProcesses < numOfProcesses){
         //sleep(1);
@@ -453,25 +506,50 @@ void RR()
         while(curr)
         {
             //printf("ana keda estalamt element mn el queue\n");
-            //printf("\n*********\n%d --- %d --- %d --- %d\n*********\n",curr->id,curr->arrival,curr->priority,curr->brust);
+            //printf("\n**\n%d --- %d --- %d --- %d\n**\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
-            printf("At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
-                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
-            
-            enqueue(queue,curr);
+            /*printf("At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
+                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);*/
+
+            bool allocated = allocateMemoryLog(curr);
+            if (allocated)
+               enqueue(queue,curr);
+            else
+               push(&waitingQueue, curr, curr->size);
             curr=createProcess();
         }
-
-
+        if(runningProcess)
+        {
+            //printf("remaining: %d",*remainingTime);
+        if(*remainingTime == 0)
+        {
+            runningProcess->running = runningProcess->brust;
+            finishProcess(runningProcess);
+            free(runningProcess);
+            runningProcess = NULL;
+            finishedProcesses++;
+            //printf("elhamdol\n");
+        }
+        else if(remainingStart-*remainingTime==slot)
+        {
+            if(!isEmptyQ(queue))
+            {
+                runningProcess->running+=slot;
+                //printf("remaining: %d,%d",*remainingTime,remainingStart);
+                stopProcess(runningProcess);
+                enqueue(queue,runningProcess);
+                runningProcess=NULL;
+            }
+        }
+        }
         if(!runningProcess && !isEmptyQ(queue))
         {
             runningProcess = dequeue(queue);
-            slotStart=getClk();
             *remainingTime = runningProcess->brust-runningProcess->running;
             if(runningProcess->running)
             {
-                printf("remianing : %d\n",*remainingTime);
+                //printf("remianing : %d\n",*remainingTime);
                 resumeProcess(runningProcess);
             }
             else{
@@ -488,25 +566,8 @@ void RR()
                 }
                 runningProcess->pid=pid;
             }
+            remainingStart=*remainingTime;
         }
-        if(*remainingTime == 0 && runningProcess)
-        {
-            runningProcess->running = runningProcess->brust;
-            finishProcess(runningProcess);
-            free(runningProcess);
-            runningProcess = NULL;
-            finishedProcesses++;
-            //printf("elhamdol\n");
-        }
-        if(getClk()-slotStart==slot&&runningProcess)
-        {
-            if(!isEmptyQ(queue))
-            {
-                runningProcess->running+=slot;
-                stopProcess(runningProcess);
-                enqueue(queue,runningProcess);
-                runningProcess=NULL;
-            }
-        }
+        
     }
 }

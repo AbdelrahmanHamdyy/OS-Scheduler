@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <math.h>
+#include "semlib.h"
 
 typedef short bool;
 #define true 1
