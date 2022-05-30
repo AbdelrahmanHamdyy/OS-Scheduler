@@ -529,9 +529,12 @@ void RR()
     while(finishedProcesses < numOfProcesses){
         //sleep(1);
         //printf("yamosahel\n");
-        struct PCB *curr = createProcess();
+        while(arrivals[getClk()])
+        {
+            struct PCB *curr = createProcess();
         while(curr)
         {
+            arrivals[getClk()]--;   
             //printf("ana keda estalamt element mn el queue\n");
             //printf("\n**\n%d --- %d --- %d --- %d\n**\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
@@ -546,6 +549,8 @@ void RR()
                push(&waitingQueue, curr, curr->size);
             curr=createProcess();
         }
+        }
+        
         if(runningProcess)
         {
             //printf("remaining: %d",*remainingTime);
@@ -558,12 +563,13 @@ void RR()
             finishedProcesses++;
             //printf("elhamdol\n");
         }
-        else if(remainingStart-*remainingTime==slot)
+        else if(remainingStart-*remainingTime==slot&&!arrivals[getClk()])
         {
             if(!isEmptyQ(queue))
             {
                 runningProcess->running+=slot;
                 //printf("remaining: %d,%d",*remainingTime,remainingStart);
+                //printf("arrivals now %d",arrivals[getClk()]);
                 stopProcess(runningProcess);
                 enqueue(queue,runningProcess);
                 runningProcess=NULL;
