@@ -303,42 +303,42 @@ void deallocateMemoryLog(struct PCB* p)
 void resumeProcess(struct PCB* p)
 {
     p->wait += getClk()-p->stop;
-    fprintf(SchedulerLog, "At time %d process %d resume arr  %d total %d remain %d wait %d\n",
+    fprintf(SchedulerLog, "At time %d process %d resumed arr %d total %d remain %d wait %d\n",
                                 getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
     int *prev =(int *) shmat(prevClkID, (void *)0, 0);
     *prev=getClk();
     shmdt(prev);
     printf("pid: %d, process %d \n",runningProcess->pid,runningProcess->id);
     kill(p->pid,SIGCONT);
-    printf("At time %d process %d resume arr  %d total %d remain %d wait %d\n",
+    printf("At time %d process %d resumed arr %d total %d remain %d wait %d\n",
                                  getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
 void stopProcess(struct PCB* p)
 {
     fflush(stdout);
     p->stop = getClk();
-    fprintf(SchedulerLog, "At time %d process %d stopped arr  %d total %d remain %d wait %d\n", 
+    fprintf(SchedulerLog, "At time %d process %d stopped arr %d total %d remain %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
     kill(p->pid,SIGSTOP);
-     printf( "At time %d process %d stopped arr  %d total %d remain %d wait %d\n", 
+     printf( "At time %d process %d stopped arr %d total %d remain %d wait %d\n", 
                                 getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
 
 void resumeSRTN(struct PCB* p)
 {
     p->wait += getClk()-p->stop;
-    fprintf( SchedulerLog, "At time %d process %d resume arr  %d total %d remain %d wait %d\n",
+    fprintf( SchedulerLog, "At time %d process %d resume arr %d total %d remain %d wait %d\n",
                                 getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
-     printf("At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
+     printf("At time %d process %d resumed arr %d total %d remain  %d wait %d\n",
                               getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 
 }
 void stopSRTN(struct  PCB* p)
 {
      p->stop=getClk();
-    fprintf( SchedulerLog, "At time %d process %d stopped arr  %d total %d remain %d wait %d\n", 
+    fprintf( SchedulerLog, "At time %d process %d stopped arr %d total %d remain %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
-    printf( "At time %d process %d stoped arr  %d total %d remain  %d wait %d\n", 
+    printf( "At time %d process %d stopped arr %d total %d remain  %d wait %d\n", 
                               getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
 
@@ -359,10 +359,11 @@ void finishProcess(struct PCB* p)
     idx++;
     totalbrust+=p->brust;
     finalclk=getClk();
-    fprintf(SchedulerLog, "At time %d process %d finished arr  %d total %d remain %d wait %d  TA %d WTA %.2f\n", 
+    fprintf(SchedulerLog, "At time %d process %d finished arr %d total %d remain %d wait %d TA %d WTA %.2f\n", 
                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);
-    printf("At time %d process %d finished arr  %d total %d remain %d wait %d  TA %d WTA %.2f\n", 
-                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);                        
+    printf("At time %d process %d finished arr %d total %d remain %d wait %d TA %d WTA %.2f\n", 
+                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);  
+    Node* tempQueue = NULL;                      
     while(!isEmpty(&waitingQueue)) {
         printf("Inside Waiting Queue Loop\n");
         struct PCB *waitingProcess = peek(&waitingQueue);
@@ -373,21 +374,33 @@ void finishProcess(struct PCB* p)
                 enqueue(queue, waitingProcess);
             else if (typeAlgo == 2)
                 push(&readyQueue, waitingProcess, waitingProcess->brust - waitingProcess->running);
-            else
-                push(&readyQueue, waitingProcess, waitingProcess->priority);
         }
         else
-            break;
-    }                      
+        {  
+            //printf("tempppp\n"); 
+            if (typeAlgo == 3)
+                break;
+            else if (typeAlgo == 2) {
+                pop(&waitingQueue);
+                push(&tempQueue, waitingProcess, waitingProcess->brust - waitingProcess->running);
+            }
+        }
+    }
+    while(!isEmpty(&tempQueue)) {
+        //printf("from temppp to waitingggg\n"); SRTN kda kda
+        struct PCB* tempProcess = peek(&tempQueue);
+        push(&waitingQueue, tempProcess, tempProcess->brust - tempProcess->running);
+        pop(&tempQueue);
+    }
 }
 
 void startProcess(struct PCB* p)
 {
     p->start = getClk();
     p->wait += p->start-p->arrival;
-    fprintf(SchedulerLog, "At time %d process %d started arr  %d total %d remain %d wait %d\n", 
+    fprintf(SchedulerLog, "At time %d process %d started arr %d total %d remain %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
-     printf("At time %d process %d started arr  %d total %d remain %d wait %d\n", 
+     printf("At time %d process %d started arr %d total %d remain %d wait %d\n", 
                                 getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 
 }
@@ -406,8 +419,8 @@ void HPF(){
     
             //printf("ana keda estalamt element mn el queue\n");
             //printf("\n**\n%d --- %d --- %d --- %d\n**\n",curr->id,curr->arrival,curr->priority,curr->brust);
-            fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
-                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
+            /*fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
+                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);*/
             /*bool allocated = allocateMemoryLog(curr);
             if (allocated)
                push(&readyQueue,curr,curr->priority);
@@ -464,8 +477,8 @@ void SRTN(){
                  printf("Total burst time is %d",totalbrust);
                 // printf("ana keda estalamt element mn el queue\n");
                 printf("\n****\n ID: %d---Arr:%d ---Priority:%d ---Brust:%d\n****\n",curr->id,curr->arrival,curr->priority,curr->brust);
-                fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
-                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
+                /*fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
+                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);*/
                   bool allocated = allocateMemoryLog(curr);
                     printf("%d\n",allocated);
 
@@ -475,7 +488,7 @@ void SRTN(){
                      }
                     else
                      {
-                        push(&waitingQueue, curr, curr->size);
+                        push(&waitingQueue, curr, curr->brust - curr->running);
                      }
                  curr=createProcess();
              }
@@ -573,8 +586,8 @@ void RR()
             arrivals[getClk()]--;   
             //printf("ana keda estalamt element mn el queue\n");
             //printf("\n*\n%d --- %d --- %d --- %d\n*\n",curr->id,curr->arrival,curr->priority,curr->brust);
-            fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
-                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
+            /*fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
+                               getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);*/
             /*printf("At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);*/
 
