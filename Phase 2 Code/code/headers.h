@@ -100,6 +100,13 @@ void setPCB(struct PCB* wantedone,int val1,int val2,int val3,int val4,int val5,i
     wantedone->stop=val9;
     wantedone->wait=val10;
 }
+// Memory Node
+struct memory_node
+{
+    int size;
+    int start;
+    struct memory_node*next;
+};
 //-----------------------------------------------------------
 // Node
 typedef struct node {

@@ -1,111 +1,17 @@
 #include "headers.h"
-#define MEMORY_LIMIT 1024
-//Physical memory 
-struct memory_node*memory[11];
-struct memory_node
-{
-    int size;
-    int start;
-    struct memory_node*next;
-};
-void rabbit(int start,int i,int size)
-{
-    struct memory_node*temp=malloc(sizeof(struct memory_node));
-    temp->start=start;
-    temp->size=size;
-    temp->next=memory[i];
-    memory[i]=temp;
-}
-int allocate(int size)
-{
-    
-    int memSize=ceil(log2(size));
-    int startSplit=memSize;
-    while(startSplit<11 && !memory[startSplit])
-    {
-        startSplit++;
-    } 
-    for(int i=startSplit;i>memSize&& i<11;i--)
-    {
-        int childSize=1<<(i-1);
-        struct memory_node*temp=memory[i];
-        memory[i]=memory[i]->next;
-        int start=temp->start;
-        free(temp);
-        rabbit(start+childSize,i-1,childSize);
-        rabbit(start,i-1,childSize);
-    }
-     
-    if(memory[memSize])
-    {
-        struct memory_node*temp=memory[memSize];
-        memory[memSize]=memory[memSize]->next;
-        int start=temp->start;
-        free(temp);
-        return start;
-    }
-    else
-    {
-        return -1;
-    }
-}
-void deallocate(int start,int size)
-{
-    int i=ceil(log2(size));
-    size=1<<i;
-    int index=start/size;
-    int op=0;
-    if(index%2==0)
-    {
-         op=1;
-    }
-    else
-    {
-        op=-1;
-    }
-     struct memory_node* temp=memory[i];
-        int found=0;
-         struct memory_node* prev=NULL;
-        while(temp){
-            int tempIndex=temp->start/temp->size;
-            if(tempIndex==(index+op)){
-                if(prev==NULL)
-                    memory[i]=temp->next;
-                else
-                    prev->next=temp->next;
-                if(index%2==0)
-                {
-                    deallocate(start, size*2);
-                }
-                else
-                {
-                    deallocate(temp->start, size*2);
-                }
-                  free(temp);
-                found=1;
-                break;
-            }
-            prev=temp;
-        temp=temp->next;
-        }
-        if(!found){
-           rabbit(start,i,size);
-    }
-}
 
-//this struct can be considered as letter 
-
-int shmid1,arrivalsshID,msgq_id,prevClkID,numOfProcesses,typeAlgo,slot,finishedProcesses=0;
+int shmid1,arrivalsshID,msgq_id,prevClkID,numOfProcesses,typeAlgo,slot,finishedProcesses=0,totalbrust=0,finalclk=0;
 int*remainingTime;
 int*arrivals;
+int idx=0;
 union Semun semun;
+double TotalWaitingTime=0,TotalWTA=0;
+double*WTA_Arr;
 int sem;
 struct PCB *runningProcess,*temporary;
 Node* readyQueue,*Stopping_Resuming_Queue;
-FILE * SchedulerLog;
-FILE * MemoryLog;
+FILE * SchedulerLog,*schedulerperf;
 struct Queue* queue;
-Node* waitingQueue;
 void remainingTimeSharedMemory()
 {
     key_t shmKey1;
@@ -188,7 +94,6 @@ struct PCB *createProcess()
         newProcess->running=0;
         newProcess->wait=0;
         newProcess->stop=0;
-        newProcess->size = message.memsize;
        // printf("\nMessage received: at time %d\n",getClk());
         return newProcess;
     }
@@ -199,14 +104,13 @@ void SRTN();
 void RR();
 
 void handl(int signum) {}
-
+void Writeperf();
 int main(int argc, char * argv[])
 {
     initClk();
-    rabbit(0,10,MEMORY_LIMIT);
     SchedulerLog = fopen("scheduler.log", "w");
-    MemoryLog = fopen("memory.log", "w");
-    //printf("********\nana fel scheduler\n***********\n");
+    schedulerperf=fopen("scheduler.perf", "w");
+    //printf("***\nana fel scheduler\n****\n");
     //TODO implement the scheduler :)
     //upon termination release the clock resources.
     //shared memory between process and scheduler (remaining time)
@@ -225,6 +129,7 @@ int main(int argc, char * argv[])
 	}
     signal(SIGCHLD,handl);
     numOfProcesses = atoi(argv[0]);
+   WTA_Arr=malloc(numOfProcesses*sizeof(double));
     typeAlgo =  atoi(argv[1]);
     if(typeAlgo==3)
         slot= atoi(argv[2]);
@@ -249,7 +154,7 @@ int main(int argc, char * argv[])
         default:
         HPF();
     }
-    
+    Writeperf();
     printf("Scheduling done\n");
     shmdt(remainingTime);
     shmdt(arrivals);
@@ -258,30 +163,21 @@ int main(int argc, char * argv[])
     shmctl(arrivalsshID, IPC_RMID, NULL);
     //semctl(sem, 0, IPC_RMID);
     fclose(SchedulerLog);
-    fclose(MemoryLog);
+    fclose(schedulerperf);
     destroyClk(true);
 }
-
-bool allocateMemoryLog(struct PCB* p) 
+void Writeperf()
 {
-    printf("Allocating Memory..\n");
-    p->startAddress = allocate(p->size);
-    int i = p->startAddress;
-    printf("After Allocation - start %d - size %d\n", i, p->size);
-    if (i == -1)
-        return false;
-    int j = i + pow(2, ceil(log2(p->size))) - 1;
-    fprintf(MemoryLog, "At time %d allocated %d bytes for process %d from %d to %d\n", getClk(), p->size, p->id, i, j);
-    return true;
-}
-
-void deallocateMemoryLog(struct PCB* p) 
-{
-    printf("Deallocating Memory..\n");
-    int i = p->startAddress;
-    int j = i + pow(2, ceil(log2(p->size))) - 1;
-    deallocate(p->startAddress, p->size);
-    fprintf(MemoryLog, "At time %d freed %d bytes for process %d from %d to %d\n", getClk(), p->size, p->id, i, j);
+     fprintf(schedulerperf, "CPU utilization = %0.2f%c \n",((float)totalbrust/finalclk)*100,'%');
+     fprintf(schedulerperf,"Avg WTA = %0.2f \n",TotalWTA/numOfProcesses);
+     double avg=TotalWTA/numOfProcesses;
+     fprintf(schedulerperf,"Avg Waiting = %0.2f \n",TotalWaitingTime/numOfProcesses);
+     double sd=0;
+     for(int i=0;i<numOfProcesses;i++)
+     {
+         sd+=pow((WTA_Arr[i]-avg),2);
+     }
+      fprintf(schedulerperf,"Std WTA = %0.2f \n",sd/numOfProcesses);
 }
 
 void resumeProcess(struct PCB* p)
@@ -313,8 +209,8 @@ void resumeSRTN(struct PCB* p)
     p->wait += getClk()-p->stop;
     fprintf( SchedulerLog, "At time %d process %d resume arr  %d total %d remain %d wait %d\n",
                                 getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
-    // printf("At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
-    //                             getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
+     printf("At time %d process %d resume arr  %d total %d remain  %d wait %d\n",
+                              getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 
 }
 void stopSRTN(struct  PCB* p)
@@ -322,8 +218,8 @@ void stopSRTN(struct  PCB* p)
      p->stop=getClk();
     fprintf( SchedulerLog, "At time %d process %d stopped arr  %d total %d remain %d wait %d\n", 
                                getClk(), p->id, p->arrival, p->brust,p->brust-p->running, p->wait);
-    // printf( "At time %d process %d stoped arr  %d total %d remain  %d wait %d\n", 
-    //                            getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
+    printf( "At time %d process %d stopped arr  %d total %d remain  %d wait %d\n", 
+                              getClk(), p->id, p->arrival, p->brust, p->brust-p->running , p->wait);
 }
 
 void finishProcess(struct PCB* p)
@@ -332,28 +228,20 @@ void finishProcess(struct PCB* p)
     int stat_loc;
     waitpid(runningProcess->pid, &stat_loc, 0);    
     p->wait = getClk()-p->arrival-p->brust;
-    deallocateMemoryLog(p);
     double WTA = (getClk() - p->arrival) * 1.0 / p->brust;
-      fprintf(SchedulerLog, "At time %d process %d finished arr  %d total %d remain %d wait %d  TA %d WTA %.2f\n", 
+    if (p->brust==0)
+      WTA=0;
+    TotalWaitingTime+=p->wait;
+    TotalWTA+=((int)(WTA*100))/100.0;
+    WTA_Arr[idx]=((int)(WTA*100))/100.0;
+    idx++;
+    totalbrust+=p->brust;
+    finalclk=getClk();
+    fprintf(SchedulerLog, "At time %d process %d finished arr  %d total %d remain %d wait %d  TA %d WTA %.2f\n", 
                                getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);
     printf("At time %d process %d finished arr  %d total %d remain %d wait %d  TA %d WTA %.2f\n", 
                                 getClk(), p->id, p->arrival, p->brust, p->brust-p->running ,p->wait,getClk() - p->arrival,WTA);                        
-    while(!isEmpty(&waitingQueue)) {
-        printf("Inside Waiting Queue Loop\n");
-        struct PCB *waitingProcess = peek(&waitingQueue);
-        bool allocated = allocateMemoryLog(waitingProcess);
-        if (allocated) {
-            pop(&waitingQueue);
-            if (typeAlgo == 3)
-                enqueue(queue, waitingProcess);
-            else if (typeAlgo == 2)
-                push(&readyQueue, waitingProcess, waitingProcess->brust - waitingProcess->running);
-            else
-                push(&readyQueue, waitingProcess, waitingProcess->priority);
-        }
-        else
-            break;
-    }                      
+                    
 }
 
 void startProcess(struct PCB* p)
@@ -378,17 +266,14 @@ void HPF(){
         while(curr)
         {
             arrivals[getClk()]--;
+    
             //printf("ana keda estalamt element mn el queue\n");
-            //printf("\n****\n%d --- %d --- %d --- %d\n****\n",curr->id,curr->arrival,curr->priority,curr->brust);
+            //printf("\n**\n%d --- %d --- %d --- %d\n**\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
-            /*bool allocated = allocateMemoryLog(curr);
-            if (allocated)
-               push(&readyQueue,curr,curr->priority);
-            else
-               push(&waitingQueue, curr, curr->size);*/
             push(&readyQueue,curr,curr->priority);
             curr=createProcess();
+            
         }
         }
         // if(runningProcess)
@@ -398,7 +283,6 @@ void HPF(){
         {
             runningProcess = peek(&readyQueue);
             pop(&readyQueue);
-            allocateMemoryLog(runningProcess);
             *remainingTime = runningProcess->brust;
             startProcess(runningProcess);
             int pid = fork();
@@ -413,7 +297,6 @@ void HPF(){
                 execl("./process","process", NULL);
             }
         }
-
         //int currClk = getClk();
         if(*remainingTime == 0 && runningProcess)
         {
@@ -428,28 +311,36 @@ void HPF(){
 
 void SRTN(){
     printf("SRTN\n");
-
     while(finishedProcesses < numOfProcesses){   
-        // printf("we are at time %d\n",getClk()); 
-        struct PCB *curr = createProcess();
-        while(curr)
+         while(arrivals[getClk()])
         {
-           // printf("ana keda estalamt element mn el queue\n");
-            printf("\n*********\n ID: %d---Arr:%d ---Priority:%d ---Brust:%d\n*********\n",curr->id,curr->arrival,curr->priority,curr->brust);
-            fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
+                struct PCB *curr = createProcess();
+                while(curr)
+             {
+                 arrivals[getClk()]--;  
+                 printf("Total burst time is %d",totalbrust);
+                // printf("ana keda estalamt element mn el queue\n");
+                printf("\n****\n ID: %d---Arr:%d ---Priority:%d ---Brust:%d\n****\n",curr->id,curr->arrival,curr->priority,curr->brust);
+                fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
-            bool allocated = allocateMemoryLog(curr);
-            if (allocated)
-               push(&readyQueue, curr, curr->brust - curr->running);
-            else
-               push(&waitingQueue, curr, curr->size);
-
-            curr=createProcess();
+                push(&readyQueue, curr, curr->brust - curr->running);
+                curr=createProcess();
+             }
         }
- 
+        if (runningProcess) {
+            sleep(1);
+        }
+          if(*remainingTime<=0 && runningProcess )
+        {
+            runningProcess->running=runningProcess->brust;
+            finishProcess(runningProcess);
+            free(runningProcess);
+            runningProcess=NULL;
+            finishedProcesses++;
+           // printf(" total number of processes are %d and total number of finished are %d\n",numOfProcesses,finishedProcesses);
+        }
        if(runningProcess && !isEmpty(&readyQueue))
         {
-
            temporary = peek(&readyQueue);
            if(temporary->brust < *remainingTime)
            {
@@ -464,7 +355,6 @@ void SRTN(){
                 MYone->running = runningProcess->running;
                 MYone->wait = runningProcess->wait;
                 MYone->stop = getClk();
-                MYone->size = runningProcess->size;
                 push(&readyQueue, MYone, MYone->brust-MYone->running);
                 push(&Stopping_Resuming_Queue, MYone, MYone->brust-MYone->running);
                 stopSRTN(runningProcess);
@@ -473,24 +363,24 @@ void SRTN(){
                 killpg(getpgrp(), SIGCHLD);
            }
         }
-
-        if(*remainingTime == 0 && runningProcess)
-        {
-            runningProcess->running = runningProcess->brust;
-            finishProcess(runningProcess);
-            free(runningProcess);
-            runningProcess = NULL;
-            finishedProcesses++;
-        }
-
         if(!runningProcess && !isEmpty(&readyQueue))
         {
-            
             runningProcess = peek(&readyQueue);
             pop(&readyQueue);
+            while(runningProcess->brust==0)
+            {
+                startProcess(runningProcess);
+                finishProcess(runningProcess);
+                free(runningProcess);
+                runningProcess=NULL;
+                finishedProcesses++;
+               // printf(" total number of processes are %d and total number of finished are %d\n",numOfProcesses,finishedProcesses);
+                runningProcess = peek(&readyQueue);
+                pop(&readyQueue);
+            }
             *remainingTime = runningProcess->brust-runningProcess->running;
-            QueuePrint(&readyQueue);
-            QueuePrint(&Stopping_Resuming_Queue);
+           // QueuePrint(&readyQueue);
+          //  QueuePrint(&Stopping_Resuming_Queue);
             if(IsTHere(&Stopping_Resuming_Queue,runningProcess->id))
             {
                 resumeSRTN(runningProcess);
@@ -510,7 +400,6 @@ void SRTN(){
                 execl("./process","process", NULL);
             }
         }
-
         if(*remainingTime==0 && runningProcess )
         {
             runningProcess->running=runningProcess->brust;
@@ -518,8 +407,8 @@ void SRTN(){
             free(runningProcess);
             runningProcess=NULL;
             finishedProcesses++;
+          //  printf(" total number of processes are %d and total number of finished are %d\n",numOfProcesses,finishedProcesses);
         }
-        // sleep(1);
     }
 }
 void RR()
@@ -536,17 +425,12 @@ void RR()
         {
             arrivals[getClk()]--;   
             //printf("ana keda estalamt element mn el queue\n");
-            //printf("\n**\n%d --- %d --- %d --- %d\n**\n",curr->id,curr->arrival,curr->priority,curr->brust);
+            //printf("\n*\n%d --- %d --- %d --- %d\n*\n",curr->id,curr->arrival,curr->priority,curr->brust);
             fprintf( SchedulerLog,"At time %d process %d arrived arr  %d total %d remain %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);
             /*printf("At time %d process %d arrived arr  %d total %d remain  %d wait %d\n", 
                                getClk(), curr->id, curr->arrival, curr->brust, curr->brust-curr->running , curr->wait);*/
-
-            bool allocated = allocateMemoryLog(curr);
-            if (allocated)
-               enqueue(queue,curr);
-            else
-               push(&waitingQueue, curr, curr->size);
+            enqueue(queue,curr);
             curr=createProcess();
         }
         }
