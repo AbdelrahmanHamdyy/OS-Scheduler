@@ -20,15 +20,13 @@ int main(int argc, char * argv[])
 {
     signal(SIGINT, clearResources);
 
-    // TODO Initialization
+    // Initialization
 
-    // Initializing Message Queue
     arrivalsSharedMemory();
     int *arrivals;
     arrivals = (int*) shmat(shmid, 0, 0);
-    //memset(arrivals, 0, 1000);
-    for(int i=0;i<1000;i++)
-    arrivals[i]=0;
+    for(int i = 0;i < 1000; i++)
+        arrivals[i] = 0;
 
     key_t key_id;
     int send_val;
@@ -69,7 +67,7 @@ int main(int argc, char * argv[])
     struct processData *processes = malloc(sizeof(struct processData) * numberOfProcesses); // Array of processes
     fscanf(file, "%*[^\n]");
     int index = 0;
-    printf("Input*\n");
+    printf("***Input***\n");
     printf("id   arrival   runtime   priority\n");
     while (index < numberOfProcesses) {
         int i, a, r, p;
@@ -109,7 +107,6 @@ int main(int argc, char * argv[])
     if (pid == -1) 
         perror("Error in creating scheduler process\n");
     else if (pid == 0) {
-        //system("gcc scheduler.c -o scheduler.out ");
         system("gcc -Wall -o scheduler.out scheduler.c -lm -fno-stack-protector");
         printf("Scheduling..\n");
         char n_str[10], a_str[10], t_str[10];
