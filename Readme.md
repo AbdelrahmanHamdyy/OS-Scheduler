@@ -1,7 +1,7 @@
 <div align= >
    
 
-# <img align=center width=75px height=75px src="https://media3.giphy.com/media/OEDg5jvoZzYbBxqoRL/giphy.gif?cid=ecf05e472c40ymhxtl46b0gpa6vaexyzeqph7p3eov22ozpw&rid=giphy.gif&ct=s"> Operating System Scheduler
+# <img align=center width=75px height=75px src="https://raw.githubusercontent.com/MaruanBO/MaruanBO/master/assets/linux.gif"> Operating System Scheduler
 
 
 </div>
