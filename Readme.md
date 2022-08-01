@@ -102,22 +102,22 @@ or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%20
  </ul>
 <br>
 <li>Open terminal</li>
-<li> Build file process_generator.c.
+<br>
+<li> Build file process_generator.c.</li>
 
 <br>
 
 ```
 gcc process_generator.c -o ex
 ```
-</li>
-<li> Run ex.
+
+<li> Run ex.</li>
 
 <br>
 
 ```
 ./ex
 ```
-</li>
 <br>
 <li>Choose a scheduling algorithm.
 
@@ -186,8 +186,11 @@ There are 2 output file "scheduler.Log" and "scheduler.perf". "memory.log" id cr
 <br>
 <ol>
 <li>Queue</li>
+<br>
 <li>Priority Queue</li>
+<br>
 <li>Process Data
+<br>
 <ul>
 <li>Arrival time</li>
 <li>Priority</li>
@@ -196,6 +199,7 @@ There are 2 output file "scheduler.Log" and "scheduler.perf". "memory.log" id cr
 <li>Memsize</li>
 </ul>
 </li>
+<br>
 <li>Memory Node
 <ul>
 <li>Size</li>
@@ -203,6 +207,7 @@ There are 2 output file "scheduler.Log" and "scheduler.perf". "memory.log" id cr
 <li>Pointer to the next memory node</li>
 </ul>
 </li>
+<br>
 <li> PCB for each process
 <ul>
 <li>ID</li>
