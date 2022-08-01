@@ -6,7 +6,7 @@
 
 </div>
 <p align="center">
-   <img align="center" width=600px height=450px src="https://cdn.dribbble.com/users/1555712/screenshots/5356776/microsoft.gif" alt="logo">
+   <img align="center" width=600px height=450px src="https://cdn.dribbble.com/users/1243527/screenshots/4928430/file-transfer.gif" alt="logo">
 </p>
 
 <p align="center"> 
@@ -92,6 +92,7 @@ or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%20
 
  </div>
 <br>
+<li>Open terminal</li>
 <li> Build file process_generator.c.
 
 <br>
