@@ -128,6 +128,11 @@ gcc process_generator.c -o ex
 <td>Round Robin (RR)</td>
 </tr>
 </table>
+<div  align= "center"  >
+<br>
+ <img  src="https://user-images.githubusercontent.com/71986226/182130330-a6f0caad-70fa-4a68-a14c-631d28132a82.png">
+
+ </div>
 </li>
 <br>
 <li>
