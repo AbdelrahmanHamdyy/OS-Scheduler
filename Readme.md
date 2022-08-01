@@ -85,12 +85,21 @@ or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%20
 </li>
 <br>
 <li>Put input in file "processes.txt" or run file "process_generator.c" and it will put random input </li>
+<ul><li>Phase 1</li>
 <div  align= "center"  >
 <br>
 
- <img src="https://user-images.githubusercontent.com/71986226/182129022-8e52e601-cb15-4ada-9ce5-64834521d84f.png">
+ <img width=300px height=80x src="https://user-images.githubusercontent.com/71986226/182129022-8e52e601-cb15-4ada-9ce5-64834521d84f.png">
 
  </div>
+ <li>Phase 2</li>
+<div  align= "center"  >
+<br>
+
+ <img  width=300px height=80x  src="https://user-images.githubusercontent.com/71986226/182179357-966b00d5-0609-4bb4-b986-5b34f9057744.png">
+
+ </div>
+ </ul>
 <br>
 <li>Open terminal</li>
 <li> Build file process_generator.c.
@@ -139,14 +148,14 @@ gcc process_generator.c -o ex
 </li>
 <br>
 <li>
-There are 2 output file "scheduler.Log" and "scheduler.perf"
+There are 2 output file "scheduler.Log" and "scheduler.perf". "memory.log" id created in phase 2.
 <ul>
 <br>
 <li>scheduler.Log
 <div  align= "center"  >
 <br>
 
- <img src="https://user-images.githubusercontent.com/71986226/182129431-22801211-7e73-4b94-a1c0-6eb473ebefa9.png">
+ <img width=600px src="https://user-images.githubusercontent.com/71986226/182129431-22801211-7e73-4b94-a1c0-6eb473ebefa9.png">
 
  </div>
 </li>
@@ -156,6 +165,14 @@ There are 2 output file "scheduler.Log" and "scheduler.perf"
 <br>
 
  <img src="https://user-images.githubusercontent.com/71986226/182129632-ec5c139e-4ced-4506-a482-58222727a1ea.png">
+
+ </div>
+</li>
+<li>memory.log
+<div  align= "center"  >
+<br>
+
+ <img width=600px src="https://user-images.githubusercontent.com/71986226/182178875-e9f4f08b-a5fe-4f49-bc03-31d85d49a14d.png">
 
  </div>
 </li>
