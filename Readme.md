@@ -18,8 +18,9 @@
 - <a href ="#about"> 📙 overview</a>
 - <a href ="#Started"> 💻 Get Started</a>
 - <a href ="#Path"> 🎯 Path of the program</a>
-- <a href ="#Assumptions"> 📃 Assumptions</a>
 - <a href ="#Work"> 🧱  Data Structures Used </a>
+- ⚙<a href ="#Algorithms">  Algorithms Explanation</a>
+- <a href ="#Assumptions"> 📃 Assumptions</a>
 - <a href ="#Structure"> 📁  File Structure</a>
 - <a href ="#Contributors"> ✨ Contributors</a> 
 - <a href ="#License"> 🔒 License</a> 
@@ -161,20 +162,33 @@ There are 2 output file "scheduler.Log" and "scheduler.perf"
 </li>
 </ol>
 <hr style="background-color: #4b4c60"></hr>
- <a id ="Assumptions"></a>
+ <a id ="Algorithms"></a>
 
-## <img align= "center" width=60px height=70px src="https://media2.giphy.com/media/8pEnqbR2gapFekW4KK/giphy.gif?cid=ecf05e47ire2dp6wrcli5orn0gddraxve7sug4v3753pquxa&rid=giphy.gif&ct=s">Assumptions
+## <img align= "center" width=70px height=70px src="https://media0.giphy.com/media/Lqo3UBlXeHwZDoebKX/giphy.gif?cid=ecf05e47axkic0jguefzmfvqv5ncejylr7hhml03ciklbmdw&rid=giphy.gif&ct=s">Algorithms Explanation
 <br>
 <ol>
-<li>
-In the memory waiting queue, it is implemented as a priority queue based on the algorithm so if it’s a SRTN, the priority is the remaining time while for RR, it is based on the memory size where the smaller one gets put into the ready queue first. As for the HPF, there is no need since the running process is the only one put into the ready queue.
+<li>HPF
+<ul>
+<li>The main loop checks if the processes are all finished or not. </li>
+<li>In an inner loop, we get all the processes arrived at this particular second and enqueue them in the ready queue.</li>
+<li>If there is no current process and the ready queue isn’t empty, we directly pop from the ready queue as it’s already sorted with the minimum priority, then start the process, fork it, and execl Process.c.</li>
+<li>Last check: If the remaining time of the running process is zero, then it is finished and the running process is set to NULL. The finished processes counter is incremented as well and the loop continues.</li>
+</ul>
 </li>
-<br>
-<li>
-We made an array of arrivals in the process generator as a shared memory with the scheduler in order to make sure that any process arriving at a specific time is read by the scheduler and not skipped.
+<li>SRTN
+<ul>
+<li>Receiving the processes from the process generator.</li>
+<li>Checking if the coming process's burst time is smaller than the remaining time of the running process.</li>
+<li>If it's smaller than the running process will be added to the ready queue and saved in stop resuming queue and the smaller one will be the running process.</li>
+<li>Then every time we a process starts then we check if this process was stopped before “existing in stop resuming queue" or not to know if it started or resumed to resume the stopped process.</li>
+</ul>
 </li>
-<br>
-<li>We synchronize between the stopped process and the arrived one if they come in the same second so that the stopped process is put into the queue before the arrived process.
+<li>RR
+<ul>
+<li>Check if there are arriving processes, receive them in ready queue.</li>
+<li>Check if there is a processes finished or the time slot ended, change the state of the process from running to finished or ready respectively.</li>
+<li>Check if there are processes in ready queue and no process is running so pick up one of them and run it.</li>
+</ul>
 </li>
 </ol>
 <hr style="background-color: #4b4c60"></hr>
@@ -186,13 +200,13 @@ We made an array of arrivals in the process generator as a shared memory with th
 <li>Queue</li>
 <li>Priority Queue</li>
 <li>Process Data
-<ol>
+<ul>
 <li>Arrival time</li>
 <li>Priority</li>
 <li>Run time</li>
 <li>ID</li>
 <li>Memsize</li>
-</ol>
+</ul>
 </li>
 <li>Memory Node
 <ul>
@@ -217,7 +231,23 @@ We made an array of arrivals in the process generator as a shared memory with th
 </ul>
 </li>
 </ol>
+<hr style="background-color: #4b4c60"></hr>
+<a id ="Assumptions"></a>
 
+## <img align= "center" width=60px height=70px src="https://media2.giphy.com/media/8pEnqbR2gapFekW4KK/giphy.gif?cid=ecf05e47ire2dp6wrcli5orn0gddraxve7sug4v3753pquxa&rid=giphy.gif&ct=s">Assumptions
+<br>
+<ol>
+<li>
+In the memory waiting queue, it is implemented as a priority queue based on the algorithm so if it’s a SRTN, the priority is the remaining time while for RR, it is based on the memory size where the smaller one gets put into the ready queue first. As for the HPF, there is no need since the running process is the only one put into the ready queue.
+</li>
+<br>
+<li>
+We made an array of arrivals in the process generator as a shared memory with the scheduler in order to make sure that any process arriving at a specific time is read by the scheduler and not skipped.
+</li>
+<br>
+<li>We synchronize between the stopped process and the arrived one if they come in the same second so that the stopped process is put into the queue before the arrived process.
+</li>
+</ol>
 <hr style="background-color: #4b4c60"></hr>
 <a id="Structure"> </a>
 
