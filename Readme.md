@@ -162,37 +162,7 @@ There are 2 output file "scheduler.Log" and "scheduler.perf"
 </li>
 </ol>
 <hr style="background-color: #4b4c60"></hr>
- <a id ="Algorithms"></a>
-
-## <img align= "center" width=70px height=70px src="https://media0.giphy.com/media/Lqo3UBlXeHwZDoebKX/giphy.gif?cid=ecf05e47axkic0jguefzmfvqv5ncejylr7hhml03ciklbmdw&rid=giphy.gif&ct=s">Algorithms Explanation
-<br>
-<ol>
-<li>HPF
-<ul>
-<li>The main loop checks if the processes are all finished or not. </li>
-<li>In an inner loop, we get all the processes arrived at this particular second and enqueue them in the ready queue.</li>
-<li>If there is no current process and the ready queue isn’t empty, we directly pop from the ready queue as it’s already sorted with the minimum priority, then start the process, fork it, and execl Process.c.</li>
-<li>Last check: If the remaining time of the running process is zero, then it is finished and the running process is set to NULL. The finished processes counter is incremented as well and the loop continues.</li>
-</ul>
-</li>
-<li>SRTN
-<ul>
-<li>Receiving the processes from the process generator.</li>
-<li>Checking if the coming process's burst time is smaller than the remaining time of the running process.</li>
-<li>If it's smaller than the running process will be added to the ready queue and saved in stop resuming queue and the smaller one will be the running process.</li>
-<li>Then every time we a process starts then we check if this process was stopped before “existing in stop resuming queue" or not to know if it started or resumed to resume the stopped process.</li>
-</ul>
-</li>
-<li>RR
-<ul>
-<li>Check if there are arriving processes, receive them in ready queue.</li>
-<li>Check if there is a processes finished or the time slot ended, change the state of the process from running to finished or ready respectively.</li>
-<li>Check if there are processes in ready queue and no process is running so pick up one of them and run it.</li>
-</ul>
-</li>
-</ol>
-<hr style="background-color: #4b4c60"></hr>
-<a id="Work"> </a>
+ <a id="Work"> </a>
 
 ## <img align= center width=70px height=70px src="https://user-images.githubusercontent.com/71986226/178469374-15498392-26a1-4ba0-99d7-9ce899c131f0.gif"> Data Structures Used 
 <br>
@@ -228,6 +198,36 @@ There are 2 output file "scheduler.Log" and "scheduler.perf"
 <li>Start time</li>
 <li>Start Address in memory</li>
 <li>Memory Size</li>
+</ul>
+</li>
+</ol>
+<hr style="background-color: #4b4c60"></hr>
+ <a id ="Algorithms"></a>
+
+## <img align= "center" width=70px height=70px src="https://media0.giphy.com/media/Lqo3UBlXeHwZDoebKX/giphy.gif?cid=ecf05e47axkic0jguefzmfvqv5ncejylr7hhml03ciklbmdw&rid=giphy.gif&ct=s">Algorithms Explanation
+<br>
+<ol>
+<li>HPF
+<ul>
+<li>The main loop checks if the processes are all finished or not. </li>
+<li>In an inner loop, we get all the processes arrived at this particular second and enqueue them in the ready queue.</li>
+<li>If there is no current process and the ready queue isn’t empty, we directly pop from the ready queue as it’s already sorted with the minimum priority, then start the process, fork it, and execl Process.c.</li>
+<li>Last check: If the remaining time of the running process is zero, then it is finished and the running process is set to NULL. The finished processes counter is incremented as well and the loop continues.</li>
+</ul>
+</li>
+<li>SRTN
+<ul>
+<li>Receiving the processes from the process generator.</li>
+<li>Checking if the coming process's burst time is smaller than the remaining time of the running process.</li>
+<li>If it's smaller than the running process will be added to the ready queue and saved in stop resuming queue and the smaller one will be the running process.</li>
+<li>Then every time we a process starts then we check if this process was stopped before “existing in stop resuming queue" or not to know if it started or resumed to resume the stopped process.</li>
+</ul>
+</li>
+<li>RR
+<ul>
+<li>Check if there are arriving processes, receive them in ready queue.</li>
+<li>Check if there is a processes finished or the time slot ended, change the state of the process from running to finished or ready respectively.</li>
+<li>Check if there are processes in ready queue and no process is running so pick up one of them and run it.</li>
 </ul>
 </li>
 </ol>
