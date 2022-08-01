@@ -85,6 +85,7 @@ or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%20
 </li>
 <br>
 <li>Put input in file "processes.txt" or run file "process_generator.c" and it will put random input </li>
+<br>
 <ul><li>Phase 1</li>
 <div  align= "center"  >
 <br>
@@ -118,7 +119,7 @@ gcc process_generator.c -o ex
 ./ex
 ```
 <br>
-<li>Choose a scheduling algorithm.
+<li>Choose a scheduling algorithm.</li>
 
 <br>
 <table>
@@ -144,7 +145,6 @@ gcc process_generator.c -o ex
  <img  src="https://user-images.githubusercontent.com/71986226/182130330-a6f0caad-70fa-4a68-a14c-631d28132a82.png">
 
  </div>
-</li>
 <br>
 <li>
 There are 2 output file "scheduler.Log" and "scheduler.perf". "memory.log" id created in phase 2.
