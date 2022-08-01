@@ -79,6 +79,13 @@ sudo dnf install gcc
 <ol>
 <li>Go to folder <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%201/code">Phase 1 </a>
 or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%202/code">Phase 2 </a> , as you want.
+<div  align= "center"  >
+<br>
+
+ <img src="https://user-images.githubusercontent.com/71986226/182129022-8e52e601-cb15-4ada-9ce5-64834521d84f.png">
+
+ </div>
+
 </li>
 <br>
 <li>Put input in file "processes.txt" or run file "process_generator.c" and it will put random input </li>
@@ -102,6 +109,7 @@ gcc process_generator.c -o ex
 <br>
 <li>Choose a scheduling algorithm.
 
+<br>
 <table>
 <tr>
 <td>Input</td>
@@ -121,8 +129,31 @@ gcc process_generator.c -o ex
 </tr>
 </table>
 </li>
-</ol>
+<br>
+<li>
+There are 2 output file "scheduler.Log" and "scheduler.perf"
+<ul>
+<br>
+<li>scheduler.Log
+<div  align= "center"  >
+<br>
 
+ <img src="https://user-images.githubusercontent.com/71986226/182129431-22801211-7e73-4b94-a1c0-6eb473ebefa9.png">
+
+ </div>
+</li>
+<br>
+<li>scheduler.perf
+<div  align= "center"  >
+<br>
+
+ <img src="https://user-images.githubusercontent.com/71986226/182129632-ec5c139e-4ced-4506-a482-58222727a1ea.png">
+
+ </div>
+</li>
+<ul>
+</li>
+</ol>
 <hr style="background-color: #4b4c60"></hr>
  <a id ="Assumptions"></a>
 
