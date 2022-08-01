@@ -17,8 +17,9 @@
 
 - <a href ="#about"> 📙 overview</a>
 - <a href ="#Started"> 💻 Get Started</a>
-- <a href ="#Path"> 📷 Path of the program</a>
+- <a href ="#Path"> 🎯 Path of the program</a>
 - <a href ="#Assumptions"> 📃 Assumptions</a>
+- <a href ="#Work"> 🧱  Data Structures Used </a>
 - <a href ="#Structure"> 📁  File Structure</a>
 - <a href ="#Contributors"> ✨ Contributors</a> 
 - <a href ="#License"> 🔒 License</a> 
@@ -31,7 +32,7 @@
 <ul> 
 <li>
 A CPU scheduler determines an order for the execution of its scheduled processes.</li>
-<li>it decides which process will run according to a certain data structure that keeps track of the processes in the system and their status.</li>
+<li>It decides which process will run according to a certain data structure that keeps track of the processes in the system and their status.</li>
 <li>A process, upon creation, has one of the three states: Running, Ready, Blocked (doing I/O, using other resources than CPU or waiting on unavailable resource).</li>
 <li>
 A bad scheduler will make a very bad operating system, so your scheduler should be as much optimized as possible in terms of memory and time usage.
@@ -174,6 +175,46 @@ We made an array of arrivals in the process generator as a shared memory with th
 </li>
 <br>
 <li>We synchronize between the stopped process and the arrived one if they come in the same second so that the stopped process is put into the queue before the arrived process.
+</li>
+</ol>
+<hr style="background-color: #4b4c60"></hr>
+<a id="Work"> </a>
+
+## <img align= center width=70px height=70px src="https://user-images.githubusercontent.com/71986226/178469374-15498392-26a1-4ba0-99d7-9ce899c131f0.gif"> Data Structures Used 
+<br>
+<ol>
+<li>Queue</li>
+<li>Priority Queue</li>
+<li>Process Data
+<ol>
+<li>Arrival time</li>
+<li>Priority</li>
+<li>Run time</li>
+<li>ID</li>
+<li>Memsize</li>
+</ol>
+</li>
+<li>Memory Node
+<ul>
+<li>Size</li>
+<li>Start</li>
+<li>Pointer to the next memory node</li>
+</ul>
+</li>
+<li> PCB for each process
+<ul>
+<li>ID</li>
+<li>PID</li>
+<li>Arrival time</li>
+<li>Burst time</li>
+<li>Finish time</li>
+<li>Running time</li>
+<li>Stop time</li>
+<li>Priority</li>
+<li>Start time</li>
+<li>Start Address in memory</li>
+<li>Memory Size</li>
+</ul>
 </li>
 </ol>
 
