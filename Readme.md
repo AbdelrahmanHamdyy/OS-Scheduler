@@ -248,6 +248,13 @@ In the gun, if you hit
 <img src="https://user-images.githubusercontent.com/71986226/177061002-d93b2d8b-831f-4eac-8538-5f9719a30fb3.gif" width="500px;"/>
 
 <hr style="background-color: #4b4c60"></hr>
+<a id="Structure"> </a>
+
+## <img align= center width=60px height=60px src="https://media1.giphy.com/media/igsIZv3VwIIlRIpq5G/giphy.gif?cid=ecf05e47faatmwdhcst7c2d4eontr459hjd35zf3an324elo&rid=giphy.gif&ct=s"> File Structure 
+<br>
+<div align= center>
+<img   src="https://user-images.githubusercontent.com/71986226/182103221-e5d5b882-f846-4794-814f-5f42403948a8.png">
+</div>
 
 <hr style="background-color: #4b4c60"></hr>
 
