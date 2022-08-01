@@ -14,7 +14,7 @@
 
 ## <img align= center width=50px height=50px src="https://thumbs.gfycat.com/HeftyDescriptiveChimneyswift-size_restricted.gif"> Table of Contents
 
-- <a href ="#about"> 📙 overview</a>
+- <a href ="#about"> 📙 Overview</a>
 - <a href ="#Started"> 💻 Get Started</a>
 - <a href ="#Path"> 🎯 Path of the program</a>
 - <a href ="#Work"> 🧱  Data Structures Used </a>
@@ -39,14 +39,14 @@ A bad scheduler will make a very bad operating system, so your scheduler should 
 </li>
 
 <li>
-The project has 2 phases.</li>
+The Project has 2 phases.</li>
 <br>
 
  - <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%201.pdf">Project Phase 1</a>
  - <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%202.pdf">Project Phase 2</a>
  
 <br>
-<li> Build using <a href="https://en.wikipedia.org/wiki/C_(programming_language)">C lnaguage</a>.</li>
+<li> Built using <a href="https://en.wikipedia.org/wiki/C_(programming_language)">C language</a>.</li>
 </ul>
 <hr style="background-color: #4b4c60"></hr>
 <a id = "Started"></a>
@@ -63,9 +63,9 @@ git clone https://github.com/AdhamAliAbdelAal/OS-Project
 ```
 
 </li>
-<li> You will need to download platform <a href="https://www.linux.org/">Linux</a>. </li>
+<li> You will need to set up the platform <a href="https://www.linux.org/">Linux</a>. </li>
 <br>
-<li>  Install a C Compiler on Linux if you haven't.
+<li> Install a C Compiler on Linux if you haven't.
 
 <br>
 
@@ -81,10 +81,10 @@ sudo dnf install gcc
 
 <ol>
 <li>Go to folder <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%201/code">Phase 1 </a>
-or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%202/code">Phase 2 </a> , as you want.
+or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%202/code">Phase 2 </a> , as you wish.
 
 </li>
-<li>Put input in file "processes.txt" or run file "process_generator.c" and it will put random input </li>
+<li>Place the input in file "processes.txt" or run file "test_generator.c" and it will generate random input </li>
 <br>
 <ul><li>Phase 1</li>
 <div  align= "center"  >
@@ -147,10 +147,10 @@ gcc process_generator.c -o ex
  </div>
 <br>
 <li>
-There are 2 output file "scheduler.Log" and "scheduler.perf". "memory.log" id created in phase 2.
+There are 2 output files "scheduler.Log" and "scheduler.perf". "memory.log" is created in phase 2.
 <ul>
 <br>
-<li>scheduler.Log
+<li>Scheduler.Log
 <div  align= "center"  >
 <br>
 
@@ -159,7 +159,7 @@ There are 2 output file "scheduler.Log" and "scheduler.perf". "memory.log" id cr
  </div>
 </li>
 <br>
-<li>scheduler.perf
+<li>Scheduler.perf
 <div  align= "center"  >
 <br>
 
@@ -167,7 +167,7 @@ There are 2 output file "scheduler.Log" and "scheduler.perf". "memory.log" id cr
 
  </div>
 </li>
-<li>memory.log
+<li>Memory.log
 <div  align= "center"  >
 <br>
 
