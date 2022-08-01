@@ -1,7 +1,7 @@
 <div align= >
    
 
-# <img align=center width=75px height=75px src="https://media3.giphy.com/media/OEDg5jvoZzYbBxqoRL/giphy.gif?cid=ecf05e472c40ymhxtl46b0gpa6vaexyzeqph7p3eov22ozpw&rid=giphy.gif&ct=s"> Operating System Simulation 
+# <img align=center width=75px height=75px src="https://media3.giphy.com/media/OEDg5jvoZzYbBxqoRL/giphy.gif?cid=ecf05e472c40ymhxtl46b0gpa6vaexyzeqph7p3eov22ozpw&rid=giphy.gif&ct=s"> Operating System Scheduler
 
 
 </div>
@@ -24,8 +24,10 @@
 - <a href ="#License"> 🔒 License</a> 
 <hr style="background-color: #4b4c60"></hr>
 
-## <img align="center"  width =60px  height =70px src="https://media2.giphy.com/media/Yn4nioYWSZMqiPNVuD/giphy.gif?cid=ecf05e47m5h78yoqhdkg8pq54o5qsxhdoltjxyfe08d4vxvg&rid=giphy.gif&ct=s"> Overview <a id = "about"></a>
+ <a id = "about"></a>
 
+## <img align="center"  width =60px  height =70px src="https://media2.giphy.com/media/Yn4nioYWSZMqiPNVuD/giphy.gif?cid=ecf05e47m5h78yoqhdkg8pq54o5qsxhdoltjxyfe08d4vxvg&rid=giphy.gif&ct=s"> Overview
+<br>
 <ul> 
 <li>
 A CPU scheduler determines an order for the execution of its scheduled processes.</li>
@@ -44,8 +46,9 @@ The project has 2 phases
 </li>
 </ul>
 <hr style="background-color: #4b4c60"></hr>
+<a id = "Started"></a>
 
-## <img  align= center width=50px height=50px src="https://c.tenor.com/HgX89Yku5V4AAAAi/to-the-moon.gif"> Get Started <a id = "Started"></a>
+## <img  align= center width=50px height=50px src="https://c.tenor.com/HgX89Yku5V4AAAAi/to-the-moon.gif"> Get Started 
 
 <ol>
 <li>Clone the repository
@@ -53,44 +56,11 @@ The project has 2 phases
 <br>
 
 ```
-git clone https://github.com/AdhamAliAbdelAal/MP-Processor-Game
+git clone https://github.com/AdhamAliAbdelAal/OS-Project
 ```
 
 </li>
-<li> you will need to download <a href="https://www.dosbox.com/">DOSBox</a> </li>
-<li> Open DOSBox </li>
-<li>To run the program
-<ol>
-<br>
-<li>
-
-```
-mount c c:\"folder_name"
-```
-</li>
-<li>
-
-```
-c:
-```
-</li>
-<li>
-
-```
-masm game
-```
-</li>
-<li>
-
-```
-game
-```
-</li>
-
-</li>
-</ol>
-
-</li>
+<li> You will need to download platform <a href="https://www.linux.org/">Linux</a> </li>
 </ol>
 <hr style="background-color: #4b4c60"></hr>
 
@@ -102,22 +72,18 @@ game
 
 ## <img align= "center" width=60px height=70px src="https://media2.giphy.com/media/8pEnqbR2gapFekW4KK/giphy.gif?cid=ecf05e47ire2dp6wrcli5orn0gddraxve7sug4v3753pquxa&rid=giphy.gif&ct=s">Assumptions
 <br>
-<ul>
+<ol>
 <li>
-
-> In the memory waiting queue, it is implemented as a priority queue based on the algorithm so if it’s a SRTN, the priority is the remaining time while for RR, it is based on the memory size where the smaller one gets put into the ready queue first. As for the HPF, there is no need since the running process is the only one put into the ready queue.
+In the memory waiting queue, it is implemented as a priority queue based on the algorithm so if it’s a SRTN, the priority is the remaining time while for RR, it is based on the memory size where the smaller one gets put into the ready queue first. As for the HPF, there is no need since the running process is the only one put into the ready queue.
 </li>
 <br>
 <li>
-
-> We made an array of arrivals in the process generator as a shared memory with the scheduler in order to make sure that any process arriving at a specific time is read by the scheduler and not skipped.
+We made an array of arrivals in the process generator as a shared memory with the scheduler in order to make sure that any process arriving at a specific time is read by the scheduler and not skipped.
 </li>
 <br>
-<li>
-
-> We synchronize between the stopped process and the arrived one if they come in the same second so that the stopped process is put into the queue before the arrived process.
+<li>We synchronize between the stopped process and the arrived one if they come in the same second so that the stopped process is put into the queue before the arrived process.
 </li>
-</ul>
+</ol>
 
 <hr style="background-color: #4b4c60"></hr>
 <a id="Structure"> </a>
