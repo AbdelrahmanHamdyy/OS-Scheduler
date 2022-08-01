@@ -6,7 +6,7 @@
 
 </div>
 <p align="center">
-   <img align="center" width=600px height=450px src="https://cdn.dribbble.com/users/1555712/screenshots/5356776/microsoft.gif" alt="logo">
+   <img align="center" width=800px height=600px src="https://cdn.dribbble.com/users/1555712/screenshots/5356776/microsoft.gif" alt="logo">
 </p>
 
 <p align="center"> 
