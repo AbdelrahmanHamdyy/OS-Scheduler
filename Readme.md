@@ -36,7 +36,6 @@ A CPU scheduler determines an order for the execution of its scheduled processes
 <li>
 A bad scheduler will make a very bad operating system, so your scheduler should be as much optimized as possible in terms of memory and time usage.
 </li>
-</li>
 
 <li>
 The project has 2 phases
@@ -44,6 +43,7 @@ The project has 2 phases
  - <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%201.pdf">Project Phase 1</a>
  - <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%202.pdf">Project Phase 2</a>
 </li>
+<li> Build using <a href="https://en.wikipedia.org/wiki/C_(programming_language)">C lnaguage</a>.</li>
 </ul>
 <hr style="background-color: #4b4c60"></hr>
 <a id = "Started"></a>
@@ -51,7 +51,7 @@ The project has 2 phases
 ## <img  align= center width=50px height=50px src="https://c.tenor.com/HgX89Yku5V4AAAAi/to-the-moon.gif"> Get Started 
 
 <ol>
-<li>Clone the repository
+<li>Clone the repository.
 
 <br>
 
@@ -60,12 +60,68 @@ git clone https://github.com/AdhamAliAbdelAal/OS-Project
 ```
 
 </li>
-<li> You will need to download platform <a href="https://www.linux.org/">Linux</a> </li>
+<li> You will need to download platform <a href="https://www.linux.org/">Linux</a>. </li>
+<br>
+<li>  Install a C Compiler on Linux if you haven't.
+
+<br>
+
+```
+sudo dnf install gcc
+```
+</li>
 </ol>
 <hr style="background-color: #4b4c60"></hr>
 
 
 ## <img align= "center" width=80px height=80px src="https://media2.giphy.com/media/dAu3qBzpmXstCTimDv/giphy.gif?cid=ecf05e475rq4hwxg7usfm1go2dc1pl5gpbnvo1izu6ph4yuh&rid=giphy.gif&ct=s"> Path of the program <a id ="Path"></a>
+
+<ol>
+<li>Go to folder <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%201/code">Phase 1 </a>
+or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%202/code">Phase 2 </a> , as you want.
+</li>
+<br>
+<li>Put input in file "processes.txt" or run file "process_generator.c" and it will put random input </li>
+<br>
+<li> Build file process_generator.c.
+
+<br>
+
+```
+gcc process_generator.c -o ex
+```
+</li>
+<li> Run ex.
+
+<br>
+
+```
+./ex
+```
+</li>
+<br>
+<li>Choose a scheduling algorithm.
+
+<table>
+<tr>
+<td>Input</td>
+<td>Algorithm</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Non-preemptive Highest Priority First (HPF)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Shortest Remaining time Next (SRTN)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Round Robin (RR)</td>
+</tr>
+</table>
+</li>
+</ol>
 
 <hr style="background-color: #4b4c60"></hr>
  <a id ="Assumptions"></a>
