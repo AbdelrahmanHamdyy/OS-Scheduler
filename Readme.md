@@ -1,7 +1,7 @@
 <div align= >
    
 
-# <img align=center width=75px height=75px src="https://raw.githubusercontent.com/MaruanBO/MaruanBO/master/assets/linux.gif"> Operating System Scheduler
+# <img align=center width=75px height=75px src="https://media3.giphy.com/media/OEDg5jvoZzYbBxqoRL/giphy.gif?cid=ecf05e472c40ymhxtl46b0gpa6vaexyzeqph7p3eov22ozpw&rid=giphy.gif&ct=s"> Operating System Scheduler
 
 
 </div>
@@ -79,16 +79,16 @@ sudo dnf install gcc
 <ol>
 <li>Go to folder <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%201/code">Phase 1 </a>
 or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%202/code">Phase 2 </a> , as you want.
+
+</li>
+<br>
+<li>Put input in file "processes.txt" or run file "process_generator.c" and it will put random input </li>
 <div  align= "center"  >
 <br>
 
  <img src="https://user-images.githubusercontent.com/71986226/182129022-8e52e601-cb15-4ada-9ce5-64834521d84f.png">
 
  </div>
-
-</li>
-<br>
-<li>Put input in file "processes.txt" or run file "process_generator.c" and it will put random input </li>
 <br>
 <li> Build file process_generator.c.
 
