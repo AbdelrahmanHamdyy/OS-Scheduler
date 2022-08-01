@@ -40,11 +40,13 @@ A bad scheduler will make a very bad operating system, so your scheduler should 
 </li>
 
 <li>
-The project has 2 phases
+The project has 2 phases.</li>
+<br>
 
  - <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%201.pdf">Project Phase 1</a>
  - <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%202.pdf">Project Phase 2</a>
-</li>
+ 
+<br>
 <li> Build using <a href="https://en.wikipedia.org/wiki/C_(programming_language)">C lnaguage</a>.</li>
 </ul>
 <hr style="background-color: #4b4c60"></hr>
@@ -83,7 +85,6 @@ sudo dnf install gcc
 or  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/tree/master/Phase%202/code">Phase 2 </a> , as you want.
 
 </li>
-<br>
 <li>Put input in file "processes.txt" or run file "process_generator.c" and it will put random input </li>
 <br>
 <ul><li>Phase 1</li>
