@@ -39,9 +39,8 @@ A bad scheduler will make a very bad operating system, so your scheduler should 
 <li>
 The project has 2 phases
 
-> <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%201.pdf">Project Phase 1</a>
-
->  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%202.pdf">Project Phase 2</a>
+ - <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%201.pdf">Project Phase 1</a>
+ - <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%202.pdf">Project Phase 2</a>
 </li>
 </ul>
 <hr style="background-color: #4b4c60"></hr>
