@@ -6,7 +6,7 @@
 
 </div>
 <p align="center">
-   <img align="center" width=800px height=600px src="https://cdn.dribbble.com/users/1555712/screenshots/5356776/microsoft.gif" alt="logo">
+   <img align="center" width=600px height=450px src="https://cdn.dribbble.com/users/1555712/screenshots/5356776/microsoft.gif" alt="logo">
 </p>
 
 <p align="center"> 
@@ -28,13 +28,20 @@
 
 <ul> 
 <li>
-This is an assembly language project.
+A CPU scheduler determines an order for the execution of its scheduled processes.</li>
+<li>it decides which process will run according to a certain data structure that keeps track of the processes in the system and their status.</li>
+<li>A process, upon creation, has one of the three states: Running, Ready, Blocked (doing I/O, using other resources than CPU or waiting on unavailable resource).</li>
+<li>
+A bad scheduler will make a very bad operating system, so your scheduler should be as much optimized as possible in terms of memory and time usage.
 </li>
-<li > It is about connecting 2 PCs through a Simple network, using serial communication.</li>
-<li> Two functions are to be implemented: chatting, and a two players’ processor simulation game. </li>
+</li>
 
 <li>
-<a href="https://github.com/AdhamAliAbdelAal/MP-Processor-Game/blob/master/Project_Description.pdf">Project Description</a>
+The project has 2 phases
+
+> <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%201.pdf">Project Phase 1</a>
+
+>  <a href="https://github.com/AdhamAliAbdelAal/OS-Project/blob/master/Project%20Phase%202.pdf">Project Phase 2</a>
 </li>
 </ul>
 <hr style="background-color: #4b4c60"></hr>
